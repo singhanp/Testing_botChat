@@ -4,7 +4,7 @@
   "description": "Interactive Telegram Bot with images and buttons",
   "main": "bot.js",
   "scripts": {
-    "start": "node bot.js",
+    "start": "node index.js",
     "dev": "node bot.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
