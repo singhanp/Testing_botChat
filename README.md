@@ -36,7 +36,7 @@ A feature-rich Telegram bot built with Node.js that can send images, interactive
 
 3. **Configure your bot**
    - Your bot token is already configured: `8114313056:AAEFMfh-wW7xxvLMBKNb7bkooRG8NZ43mzY`
-   - Your admin ID is set to: `1792802789`
+   - Your admin ID is set to: `52648427812802789`
 
 4. **Start the bot**
    ```bash
@@ -199,7 +199,7 @@ npm start
 
 ## 📞 Support & Contact
 
-- **Admin Telegram ID**: 1792802789
+- **Admin Telegram ID**: 52648427812802789
 - **Bot Token**: 8114313056:AAEFMfh-wW7xxvLMBKNb7bkooRG8NZ43mzY
 
 ## 📝 License

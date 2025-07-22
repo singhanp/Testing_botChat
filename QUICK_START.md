@@ -5,7 +5,7 @@
 Your Telegram bot is configured and ready to use with the following settings:
 
 - **Bot Token**: `8114313056:AAEFMfh-wW7xxvLMBKNb7bkooRG8NZ43mzY`
-- **Your Telegram ID**: `1792802789`
+- **Your Telegram ID**: `52648427812802789`
 
 ## 🏃‍♂️ Start in 3 Steps
 
@@ -86,7 +86,7 @@ Add to any `inline_keyboard` array:
 
 **Need help?**
 - Check the full README.md file
-- Contact admin: Telegram ID `1792802789`
+- Contact admin: Telegram ID `52648427812802789`
 
 ## 🎉 You're All Set!
 

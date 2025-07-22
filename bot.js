@@ -1,8 +1,9 @@
 const { Telegraf, Markup } = require('telegraf');
+require('dotenv').config();
 
 // Bot Configuration
-const BOT_TOKEN = '8114313056:AAEFMfh-wW7xxvLMBKNb7bkooRG8NZ43mzY';
-const ADMIN_ID = '1792802789';
+const BOT_TOKEN = process.env.BOT_TOKEN;
+const ADMIN_ID = process.env.ADMIN_ID;
 
 // Initialize bot
 const bot = new Telegraf(BOT_TOKEN);
