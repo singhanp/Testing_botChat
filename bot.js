@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const { Telegraf, Markup } = require('telegraf');
 
 // Bot Configuration - Cloud Ready with Environment Variables
