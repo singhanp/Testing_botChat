@@ -1,7 +1,7 @@
 const { Markup } = require('telegraf');
 
 module.exports = {
-  welcomeKeyboard: Markup.inlineKeyboard([
+  welcomeKeyboard: () => Markup.inlineKeyboard([
     [
       Markup.button.callback('🚀 Start Demo', 'start_demo'),
       Markup.button.callback('📋 Show Menu', 'show_menu')
@@ -10,8 +10,8 @@ module.exports = {
       Markup.button.callback('🖼️ Gallery', 'gallery'),
       Markup.button.callback('❓ Help', 'help')
     ]
-  ]),
-  helpKeyboard: Markup.inlineKeyboard([
+  ]).reply_markup,
+  helpKeyboard: () => Markup.inlineKeyboard([
     [
       Markup.button.callback('🚀 Demo', 'start_demo'),
       Markup.button.callback('🖼️ Gallery', 'gallery')
@@ -23,8 +23,8 @@ module.exports = {
     [
       Markup.button.callback('🏠 Back to Main', 'back_to_main')
     ]
-  ]),
-  demoKeyboard: Markup.inlineKeyboard([
+  ]).reply_markup,
+  demoKeyboard: () => Markup.inlineKeyboard([
     [
       Markup.button.callback('👍 Like', 'like_image'),
       Markup.button.callback('💬 Comment', 'comment_image'),
@@ -37,6 +37,6 @@ module.exports = {
     [
       Markup.button.callback('🏠 Main Menu', 'back_to_main')
     ]
-  ]),
+  ]).reply_markup,
   // Add other keyboards as needed...
 }; 
