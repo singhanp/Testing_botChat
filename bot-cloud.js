@@ -1,9 +1,9 @@
 const { Telegraf, Markup } = require('telegraf');
 
 // Bot Configuration - Cloud Ready with Environment Variables
-const BOT_TOKEN = process.env.BOT_TOKEN || '8114313056:AAEFMfh-wW7xxvLMBKNb7bkooRG8NZ43mzY';
-const ADMIN_ID = process.env.ADMIN_ID || '1792802789';
-const PORT = process.env.PORT || 3000;
+const BOT_TOKEN = process.env.BOT_TOKEN ;
+const ADMIN_ID = process.env.ADMIN_ID ;
+const PORT = process.env.PORT ;
 
 // Initialize bot
 const bot = new Telegraf(BOT_TOKEN);
