@@ -5,17 +5,80 @@ const gallery = require('./gallery');
 const demo = require('./demo');
 const home = require('./home');
 
-module.exports = (bot) => {
+module.exports = (bot, scheduler) => {
   // Store user data temporarily (if needed)
   const userData = {};
 
-  // Start command (moved to home.js)
-  home(bot, buttons);
+  // Start command
+  bot.start(async (ctx) => {
+    const welcomeMessage = `🤖 Welcome to Interactive Bot!\n\nHi ${ctx.from.first_name}! I'm your interactive Telegram bot.\n\n🔹 I can send you images\n🔹 I can show interactive buttons\n🔹 I can respond to your choices\n🔹 I can send you different types of content\n\nTry these commands:\n/help - Show all available commands\n/demo - See a demo with images and buttons\n/gallery - Browse image gallery\n/menu - Interactive menu with options\n/contact - Contact information`;
+    await ctx.reply(welcomeMessage, { reply_markup: buttons.welcomeKeyboard() });
+  });
 
   // Register separated controllers
   help(bot);
   gallery(bot);
   demo(bot);
+
+  // Good morning message commands
+  bot.command('goodmorning', async (ctx) => {
+    const chatId = ctx.chat.id;
+    const firstName = ctx.from.first_name;
+    const lastName = ctx.from.last_name || '';
+    
+    const isEnabled = await scheduler.isGoodMorningEnabled(chatId);
+    
+    if (isEnabled) {
+      await ctx.reply('🌅 You are already subscribed to good morning messages!\n\nUse /stopgoodmorning to unsubscribe.');
+    } else {
+      await scheduler.enableGoodMorning(chatId, firstName, lastName);
+      await ctx.reply('✅ Good morning messages enabled!\n\n🌞 You will receive a daily good morning message at 8:00 AM UTC.\n\nUse /stopgoodmorning to unsubscribe anytime.');
+    }
+  });
+
+  bot.command('stopgoodmorning', async (ctx) => {
+    const chatId = ctx.chat.id;
+    
+    const isEnabled = await scheduler.isGoodMorningEnabled(chatId);
+    
+    if (!isEnabled) {
+      await ctx.reply('❌ You are not subscribed to good morning messages.\n\nUse /goodmorning to subscribe.');
+    } else {
+      await scheduler.disableGoodMorning(chatId);
+      await ctx.reply('🛑 Good morning messages disabled.\n\nYou will no longer receive daily good morning messages.\n\nUse /goodmorning to subscribe again anytime.');
+    }
+  });
+
+  bot.command('goodmorningstatus', async (ctx) => {
+    const chatId = ctx.chat.id;
+    const isEnabled = await scheduler.isGoodMorningEnabled(chatId);
+    
+    if (isEnabled) {
+      await ctx.reply('✅ Good morning messages: ENABLED\n\n🌅 You will receive daily good morning messages at 8:00 AM UTC.\n\nUse /stopgoodmorning to unsubscribe.');
+    } else {
+      await ctx.reply('❌ Good morning messages: DISABLED\n\nUse /goodmorning to subscribe to good morning messages.');
+    }
+  });
+
+  // Admin command to see good morning stats
+  bot.command('goodmorningstats', async (ctx) => {
+    if (ctx.from.id.toString() === ADMIN_ID) {
+      const stats = await scheduler.getStats();
+      await ctx.reply(`📊 Good Morning Statistics:\n\n👥 Total Users: ${stats.totalUsers}\n✅ Subscribed: ${stats.subscribedUsers}\n❌ Unsubscribed: ${stats.unsubscribedUsers}\n\n🕰️ Next message: 8:00 AM UTC daily`);
+    } else {
+      await ctx.reply('❌ This command is only available for administrators.');
+    }
+  });
+
+  // Test command to send a sample good morning message (admin only)
+  bot.command('testgoodmorning', async (ctx) => {
+    if (ctx.from.id.toString() === ADMIN_ID) {
+      await scheduler.sendGoodMorningMessages();
+      await ctx.reply('🧪 Test good morning messages sent to all subscribed users!');
+    } else {
+      await ctx.reply('❌ This command is only available for administrators.');
+    }
+  });
 
   // Callback query handler for inline buttons
   bot.on('callback_query', async (ctx) => {

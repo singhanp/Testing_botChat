@@ -17,8 +17,12 @@ app.listen(PORT, () => {
 
 const bot = require('./services/telegram');
 const mainController = require('./controllers/mainController');
+const SchedulerService = require('./services/scheduler');
 
-mainController(bot);
+// Initialize scheduler
+const scheduler = new SchedulerService(bot);
+
+mainController(bot, scheduler);
 
 bot.launch()
   .then(() => console.log('🤖 Bot started!'))
