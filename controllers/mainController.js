@@ -3,16 +3,14 @@ const buttons = require('../services/buttons');
 const help = require('./help');
 const gallery = require('./gallery');
 const demo = require('./demo');
+const home = require('./home');
 
 module.exports = (bot) => {
   // Store user data temporarily (if needed)
   const userData = {};
 
-  // Start command
-  bot.start(async (ctx) => {
-    const welcomeMessage = `🤖 Welcome to Interactive Bot!\n\nHi ${ctx.from.first_name}! I'm your interactive Telegram bot.\n\n🔹 I can send you images\n🔹 I can show interactive buttons\n🔹 I can respond to your choices\n🔹 I can send you different types of content\n\nTry these commands:\n/help - Show all available commands\n/demo - See a demo with images and buttons\n/gallery - Browse image gallery\n/menu - Interactive menu with options\n/contact - Contact information`;
-    await ctx.reply(welcomeMessage, { reply_markup: buttons.welcomeKeyboard() });
-  });
+  // Start command (moved to home.js)
+  home(bot, buttons);
 
   // Register separated controllers
   help(bot);
@@ -57,7 +55,7 @@ module.exports = (bot) => {
         await ctx.reply('⚙️ Here are the settings!');
         break;
       case 'back_to_main':
-        await ctx.reply('🏠 Back to main menu!');
+        await home.handleHome(ctx);
         break;
       default:
         await ctx.answerCbQuery('Unknown action!');
