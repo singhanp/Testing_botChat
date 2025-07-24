@@ -16,6 +16,12 @@ module.exports = (bot, scheduler) => {
     await ctx.reply(welcomeMessage, { reply_markup: buttons.welcomeKeyboard() });
   });
 
+  // Respond to greetings with the same logic as /start
+  bot.hears(/^(hi|hello|hey|greetings|good\s?morning|good\s?afternoon|good\s?evening)$/i, async (ctx) => {
+    const welcomeMessage = `🤖 Welcome to Interactive Bot!\n\nHi ${ctx.from.first_name}! I'm your interactive Telegram bot.\n\n🔹 I can send you images\n🔹 I can show interactive buttons\n🔹 I can respond to your choices\n🔹 I can send you different types of content\n\nTry these commands:\n/help - Show all available commands\n/demo - See a demo with images and buttons\n/gallery - Browse image gallery\n/menu - Interactive menu with options\n/contact - Contact information`;
+    await ctx.reply(welcomeMessage, { reply_markup: buttons.welcomeKeyboard() });
+  });
+
   // Register separated controllers
   help(bot);
   gallery(bot);
