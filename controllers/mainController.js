@@ -4,6 +4,7 @@ const help = require('./help');
 const gallery = require('./gallery');
 const demo = require('./demo');
 const home = require('./home');
+const menu = require('./menu');
 
 module.exports = (bot, scheduler) => {
   // Store user data temporarily (if needed)
@@ -19,6 +20,7 @@ module.exports = (bot, scheduler) => {
   help(bot);
   gallery(bot);
   demo(bot);
+  menu(bot);
 
   // Good morning message commands
   bot.command('goodmorning', async (ctx) => {
@@ -91,7 +93,7 @@ module.exports = (bot, scheduler) => {
         await gallery.handleGallery(ctx);
         break;
       case 'show_menu':
-        await ctx.reply('📋 Here is the menu!');
+        await menu.handleMenu(ctx);
         break;
       case 'help':
         await help.handleHelp(ctx);
