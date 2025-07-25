@@ -5,6 +5,7 @@ const gallery = require('./gallery');
 const demo = require('./demo');
 const home = require('./home');
 const menu = require('./menu');
+const login = require('./login');
 
 module.exports = (bot, scheduler) => {
   // Store user data temporarily (if needed)
@@ -97,6 +98,9 @@ module.exports = (bot, scheduler) => {
         break;
       case 'gallery':
         await gallery.handleGallery(ctx);
+        break;
+      case 'login':
+        await login.handleLogin(ctx);
         break;
       case 'show_menu':
         await menu.handleMenu(ctx);

@@ -9,7 +9,10 @@ module.exports = {
     [
       Markup.button.callback('🖼️ Gallery', 'gallery'),
       Markup.button.callback('❓ Help', 'help')
-    ]
+    ],
+    [
+      Markup.button.callback('⚙️ Login', 'login'),
+    ],
   ]).reply_markup,
   helpKeyboard: () => Markup.inlineKeyboard([
     [
