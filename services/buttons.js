@@ -1,6 +1,11 @@
 const { Markup } = require('telegraf');
 
 module.exports = {
+  loginKeyBoard: () => Markup.inlineKeyboard([
+    [
+      Markup.button.callback('⚙️ Login', 'login'),
+    ],
+  ]).reply_markup,
   welcomeKeyboard: () => Markup.inlineKeyboard([
     [
       Markup.button.callback('🚀 Start Demo', 'start_demo'),
@@ -9,9 +14,6 @@ module.exports = {
     [
       Markup.button.callback('🖼️ Gallery', 'gallery'),
       Markup.button.callback('❓ Help', 'help')
-    ],
-    [
-      Markup.button.callback('⚙️ Login', 'login'),
     ],
   ]).reply_markup,
   helpKeyboard: () => Markup.inlineKeyboard([

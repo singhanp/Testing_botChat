@@ -14,14 +14,15 @@ module.exports = (bot, scheduler, botB = null) => {
   // Start command
   bot.start(async (ctx) => {
     const welcomeMessage = `🤖 Welcome to Interactive Bot!\n\nHi ${ctx.from.first_name}! I'm your interactive Telegram bot.\n\n🔹 I can send you images\n🔹 I can show interactive buttons\n🔹 I can respond to your choices\n🔹 I can send you different types of content\n\nTry these commands:\n/help - Show all available commands\n/demo - See a demo with images and buttons\n/gallery - Browse image gallery\n/menu - Interactive menu with options\n/contact - Contact information`;
-    await ctx.reply(welcomeMessage, { reply_markup: buttons.welcomeKeyboard() });
-    // If botB is provided, try to send a message from botB as well
-    if (botB) {
-      try {
-        await botB.telegram.sendMessage(ctx.from.id, '👋 Hello from Bot B! (You must have started Bot B before to receive this message.)');
-      } catch (err) {
-        console.error('Failed to send message from Bot B:', err);
-      }
+    await ctx.reply(welcomeMessage, { reply_markup: buttons.loginKeyBoard() });
+    
+    // Check if user came from login button (for Bot B)
+    const startPayload = ctx.message?.text?.split(' ')[1];
+    if (startPayload === 'from_login') {
+      console.log("User accessed Bot B from login button:", ctx.from.id);
+      await ctx.reply('🎉 Welcome from login! You successfully accessed Bot B!', {
+        reply_markup: buttons.welcomeKeyboard()
+      });
     }
   });
 
@@ -42,9 +43,9 @@ module.exports = (bot, scheduler, botB = null) => {
     const chatId = ctx.chat.id;
     const firstName = ctx.from.first_name;
     const lastName = ctx.from.last_name || '';
-    
+
     const isEnabled = await scheduler.isGoodMorningEnabled(chatId);
-    
+
     if (isEnabled) {
       await ctx.reply('🌅 You are already subscribed to good morning messages!\n\nUse /stopgoodmorning to unsubscribe.');
     } else {
@@ -55,9 +56,9 @@ module.exports = (bot, scheduler, botB = null) => {
 
   bot.command('stopgoodmorning', async (ctx) => {
     const chatId = ctx.chat.id;
-    
+
     const isEnabled = await scheduler.isGoodMorningEnabled(chatId);
-    
+
     if (!isEnabled) {
       await ctx.reply('❌ You are not subscribed to good morning messages.\n\nUse /goodmorning to subscribe.');
     } else {
@@ -69,7 +70,7 @@ module.exports = (bot, scheduler, botB = null) => {
   bot.command('goodmorningstatus', async (ctx) => {
     const chatId = ctx.chat.id;
     const isEnabled = await scheduler.isGoodMorningEnabled(chatId);
-    
+
     if (isEnabled) {
       await ctx.reply('✅ Good morning messages: ENABLED\n\n🌅 You will receive daily good morning messages at 8:00 AM UTC.\n\nUse /stopgoodmorning to unsubscribe.');
     } else {
@@ -109,6 +110,27 @@ module.exports = (bot, scheduler, botB = null) => {
         break;
       case 'login':
         await login.handleLogin(ctx);
+        // If this is Bot A and Bot B is available, direct user to Bot B
+        if (botB) {
+          console.log("Login clicked - directing user to Bot B:", ctx.from.id);
+          try {
+            // Send a message with a direct link to Bot B
+            await ctx.reply('🔐 Login successful! Click the button below to start Bot B:', {
+              reply_markup: {
+                inline_keyboard: [
+                  [
+                    { 
+                      text: '🤖 Start Bot B', 
+                      url: 'https://t.me/Hippo99bot?start=from_login' 
+                    }
+                  ]
+                ]
+              }
+            });
+          } catch (err) {
+            console.error('Failed to send message from Bot B:', err);
+          }
+        }
         break;
       case 'show_menu':
         await menu.handleMenu(ctx);
