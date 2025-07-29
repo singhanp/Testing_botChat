@@ -14,5 +14,13 @@
     "goodMorningEnabled": false,
     "joinedAt": "2025-07-22T14:55:58.776Z",
     "lastUpdated": "2025-07-22T14:56:31.754Z"
+  },
+  {
+    "chatId": 5445993412,
+    "firstName": "Kong",
+    "lastName": "Seh Len",
+    "goodMorningEnabled": true,
+    "joinedAt": "2025-07-24T04:06:54.958Z",
+    "lastUpdated": "2025-07-24T04:06:54.958Z"
   }
 ]

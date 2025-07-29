@@ -7,7 +7,7 @@ const home = require('./home');
 const menu = require('./menu');
 const login = require('./login');
 
-module.exports = (bot, scheduler) => {
+module.exports = (bot, scheduler, botB = null) => {
   // Store user data temporarily (if needed)
   const userData = {};
 
@@ -15,6 +15,14 @@ module.exports = (bot, scheduler) => {
   bot.start(async (ctx) => {
     const welcomeMessage = `🤖 Welcome to Interactive Bot!\n\nHi ${ctx.from.first_name}! I'm your interactive Telegram bot.\n\n🔹 I can send you images\n🔹 I can show interactive buttons\n🔹 I can respond to your choices\n🔹 I can send you different types of content\n\nTry these commands:\n/help - Show all available commands\n/demo - See a demo with images and buttons\n/gallery - Browse image gallery\n/menu - Interactive menu with options\n/contact - Contact information`;
     await ctx.reply(welcomeMessage, { reply_markup: buttons.welcomeKeyboard() });
+    // If botB is provided, try to send a message from botB as well
+    if (botB) {
+      try {
+        await botB.telegram.sendMessage(ctx.from.id, '👋 Hello from Bot B! (You must have started Bot B before to receive this message.)');
+      } catch (err) {
+        console.error('Failed to send message from Bot B:', err);
+      }
+    }
   });
 
   // Respond to greetings with the same logic as /start
