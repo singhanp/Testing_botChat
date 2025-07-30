@@ -4,7 +4,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.get('/', (req, res) => {
-  res.send('🤖 Telegram Bot is Running!');
+  res.send('🤖 Dual-Bot System: Bot A (Login) + Bot B (Multi-Agent Features)');
 });
 
 app.get('/health', (req, res) => {
@@ -19,17 +19,21 @@ const { botA, botB } = require('./services/telegram');
 const mainController = require('./controllers/mainController');
 const SchedulerService = require('./services/scheduler');
 
-// Initialize scheduler for both bots (if needed, or just botA)
-const schedulerA = new SchedulerService(botA);
+// Initialize scheduler for Bot B (main features)
 const schedulerB = new SchedulerService(botB);
 
-// Main controller for both bots
-mainController(botA, schedulerA, botB);
+// Bot A: Simple login/entry controller
+const loginController = require('./controllers/loginController');
+
+// Bot B: Full multi-agent controller
 mainController(botB, schedulerB);
 
+// Bot A: Login and redirect to Bot B
+loginController(botA, botB);
+
 Promise.all([
-  botA.launch().then(() => console.log('🤖 Bot A started!')),
-  botB.launch().then(() => console.log('🤖 Bot B started!'))
+  botA.launch().then(() => console.log('🤖 Bot A (Login) started!')),
+  botB.launch().then(() => console.log('🤖 Bot B (Multi-Agent Features) started!'))
 ]).catch((err) => {
   console.error('❌ Failed to start bots:', err);
   process.exit(1);

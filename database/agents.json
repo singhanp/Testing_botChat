@@ -1,0 +1,47 @@
+[
+  {
+    "agentId": "agent_001",
+    "chatId": 1792802789,
+    "firstName": "Han",
+    "lastName": "",
+    "agentName": "Agent Alpha",
+    "isActive": true,
+    "createdAt": "2025-07-22T13:34:42.299Z",
+    "lastUpdated": "2025-07-23T01:20:48.978Z",
+    "settings": {
+      "goodMorningEnabled": true,
+      "maxMembers": 50,
+      "customWelcomeMessage": "Welcome to Agent Alpha's group!"
+    }
+  },
+  {
+    "agentId": "agent_002", 
+    "chatId": 838371796,
+    "firstName": "Grey",
+    "lastName": "Mochi",
+    "agentName": "Agent Beta",
+    "isActive": true,
+    "createdAt": "2025-07-22T14:55:58.776Z",
+    "lastUpdated": "2025-07-22T14:56:31.754Z",
+    "settings": {
+      "goodMorningEnabled": false,
+      "maxMembers": 30,
+      "customWelcomeMessage": "Welcome to Agent Beta's community!"
+    }
+  },
+  {
+    "agentId": "agent_003",
+    "chatId": 5445993412,
+    "firstName": "Kong",
+    "lastName": "Seh Len", 
+    "agentName": "Agent Gamma",
+    "isActive": true,
+    "createdAt": "2025-07-24T04:06:54.958Z",
+    "lastUpdated": "2025-07-24T04:06:54.958Z",
+    "settings": {
+      "goodMorningEnabled": true,
+      "maxMembers": 100,
+      "customWelcomeMessage": "Welcome to Agent Gamma's team!"
+    }
+  }
+] 

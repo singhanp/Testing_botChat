@@ -1,0 +1,59 @@
+[
+  {
+    "memberId": "member_001",
+    "chatId": 7518041177,
+    "firstName": "Yuven Raj",
+    "lastName": "",
+    "agentId": "agent_001",
+    "joinedAt": "2025-07-29T06:53:30.321Z",
+    "lastUpdated": "2025-07-29T06:53:30.322Z",
+    "isActive": true,
+    "stats": {
+      "gamesPlayed": 0,
+      "totalScore": 0,
+      "lastGamePlayed": null
+    },
+    "preferences": {
+      "goodMorningEnabled": true,
+      "notificationsEnabled": true
+    }
+  },
+  {
+    "memberId": "member_002",
+    "chatId": 1234567890,
+    "firstName": "John",
+    "lastName": "Doe",
+    "agentId": "agent_001",
+    "joinedAt": "2025-07-30T10:00:00.000Z",
+    "lastUpdated": "2025-07-30T10:00:00.000Z",
+    "isActive": true,
+    "stats": {
+      "gamesPlayed": 5,
+      "totalScore": 1250,
+      "lastGamePlayed": "2025-07-29T15:30:00.000Z"
+    },
+    "preferences": {
+      "goodMorningEnabled": false,
+      "notificationsEnabled": true
+    }
+  },
+  {
+    "memberId": "member_003",
+    "chatId": 9876543210,
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "agentId": "agent_002",
+    "joinedAt": "2025-07-28T14:20:00.000Z",
+    "lastUpdated": "2025-07-28T14:20:00.000Z",
+    "isActive": true,
+    "stats": {
+      "gamesPlayed": 12,
+      "totalScore": 3200,
+      "lastGamePlayed": "2025-07-30T09:15:00.000Z"
+    },
+    "preferences": {
+      "goodMorningEnabled": true,
+      "notificationsEnabled": true
+    }
+  }
+] 
