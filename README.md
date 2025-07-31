@@ -19,6 +19,7 @@ A feature-rich Telegram bot built with Node.js that can send images, interactive
 
 - Node.js (v14 or higher)
 - npm (Node Package Manager)
+- MongoDB (local installation or MongoDB Atlas account)
 - A Telegram bot token from [@BotFather](https://t.me/botfather)
 
 ### Installation
@@ -35,10 +36,21 @@ A feature-rich Telegram bot built with Node.js that can send images, interactive
    ```
 
 3. **Configure your bot**
-   - Your bot token is already configured: `8114313056:AAEFMfh-wW7xxvLMBKNb7bkooRG8NZ43mzY`
-   - Your admin ID is set to: `52648427812802789`
+   - Create a `.env` file in the root directory
+   - Add your bot tokens and MongoDB connection string:
+   ```bash
+   BOT_A_TOKEN=your_bot_a_token_here
+   BOT_B_TOKEN=your_bot_b_token_here
+   MONGODB_URI=mongodb://localhost:27017/telegram-bot
+   ```
+   - For MongoDB Atlas, use: `mongodb+srv://username:password@cluster.mongodb.net/telegram-bot`
 
-4. **Start the bot**
+4. **Migrate existing data (optional)**
+   ```bash
+   npm run migrate
+   ```
+
+5. **Start the bot**
    ```bash
    npm start
    ```
@@ -136,7 +148,18 @@ reply_markup: {
 
 ```
 telegram-bot-project/
-├── bot.js              # Main bot file with all functionality
+├── config/
+│   └── database.js     # MongoDB connection configuration
+├── models/
+│   └── User.js         # User data model
+├── services/
+│   ├── userService.js  # User database operations
+│   └── ...            # Other services
+├── scripts/
+│   └── migrateToMongo.js # Data migration script
+├── database/
+│   └── users.json      # Legacy JSON data (will be migrated)
+├── index.js            # Main application entry point
 ├── package.json        # Project dependencies and scripts
 ├── README.md          # This documentation file
 └── node_modules/      # Installed dependencies (auto-generated)
@@ -146,7 +169,9 @@ telegram-bot-project/
 
 ### Dependencies
 - **telegraf** - Modern Telegram bot framework for Node.js
+- **mongoose** - MongoDB object modeling for Node.js
 - **dotenv** - Environment variable management
+- **express** - Web framework for health checks
 
 ### Error Handling
 The bot includes comprehensive error handling for:

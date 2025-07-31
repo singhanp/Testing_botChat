@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
+const { connectDB, disconnectDB } = require('./config/database');
 
 app.get('/', (req, res) => {
   res.send('🤖 Dual-Bot System: Bot A (Login) + Bot B (Multi-Agent Features)');
@@ -13,6 +14,14 @@ app.get('/health', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`🌐 Health check server running on port ${PORT}`);
+});
+
+// Connect to MongoDB
+connectDB().then(() => {
+  console.log('📊 Database connection established');
+}).catch((err) => {
+  console.error('❌ Database connection failed:', err);
+  process.exit(1);
 });
 
 const { botA, botB } = require('./services/telegram');
@@ -39,16 +48,18 @@ Promise.all([
   process.exit(1);
 });
 
-process.once('SIGINT', () => {
+process.once('SIGINT', async () => {
   console.log('\n🛑 Stopping bots...');
   botA.stop('SIGINT');
   botB.stop('SIGINT');
+  await disconnectDB();
   process.exit(0);
 });
 
-process.once('SIGTERM', () => {
+process.once('SIGTERM', async () => {
   console.log('\n🛑 Stopping bots...');
   botA.stop('SIGTERM');
   botB.stop('SIGTERM');
+  await disconnectDB();
   process.exit(0);
 }); 
