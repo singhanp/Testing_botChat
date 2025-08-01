@@ -53,6 +53,35 @@ module.exports = (bot, scheduler, botB = null) => {
     await ctx.reply(welcomeMessage, { reply_markup: keyboard });
   });
 
+  // Handle users who haven't started the bot yet (when they send any message)
+  bot.on('message', async (ctx) => {
+    // Skip if it's a command (handled by other handlers)
+    if (ctx.message.text && ctx.message.text.startsWith('/')) {
+      return;
+    }
+    
+    // Check if this is the first message from this user
+    const userId = ctx.from.id;
+    const userRole = await getUserRole(userId);
+    
+    // If user has a role but this might be their first interaction
+    if (userRole !== 'guest') {
+      const welcomeMessage = `🎉 Welcome ${ctx.from.first_name}! I see you have access to the system.\n\nUse /start to see your personalized interface based on your role (${userRole}).`;
+      await ctx.reply(welcomeMessage, {
+        reply_markup: {
+          inline_keyboard: [
+            [
+              { text: '🚀 Start My Interface', callback_data: 'start_interface' }
+            ]
+          ]
+        }
+      });
+    } else {
+      // Guest user - show basic welcome
+      await ctx.reply(`👋 Hello ${ctx.from.first_name}! Welcome to the main bot.\n\nUse /start to see available features or contact an agent to get full access.`);
+    }
+  });
+
   // Respond to greetings with role-based response
   bot.hears(/^(hi|hello|hey|greetings|good\s?morning|good\s?afternoon|good\s?evening)$/i, async (ctx) => {
     const userId = ctx.from.id;
@@ -393,6 +422,38 @@ module.exports = (bot, scheduler, botB = null) => {
         break;
       case 'back_to_main':
         await home.handleHome(ctx);
+        break;
+      case 'start_interface':
+        // Trigger the start command programmatically
+        const userId = ctx.from.id;
+        const userRole = await getUserRole(userId);
+        const userInfo = await getUserInfo(userId);
+        
+        let welcomeMessage = '';
+        let keyboard = null;
+
+        switch (userRole) {
+          case 'super_admin':
+            welcomeMessage = `👑 Welcome Super Admin ${ctx.from.first_name}!\n\n🔹 You have full system access\n🔹 Manage all agents and members\n🔹 View system-wide statistics\n🔹 Configure system settings\n\nWhat would you like to do?`;
+            keyboard = buttons.superAdminKeyboard();
+            break;
+            
+          case 'agent':
+            welcomeMessage = `👨‍💼 Welcome Agent ${ctx.from.first_name}!\n\n🔹 Manage your team members\n🔹 View your agent statistics\n🔹 Send messages to your members\n🔹 Configure your agent settings\n\nYour Agent Name: ${userInfo.agentName}`;
+            keyboard = buttons.agentKeyboard(userInfo.agentName);
+            break;
+            
+          case 'member':
+            welcomeMessage = `🎮 Welcome ${ctx.from.first_name}!\n\n🔹 Play games and earn points\n🔹 View your personal statistics\n🔹 Browse image galleries\n🔹 Customize your preferences\n\nYour Agent: ${userInfo.agentInfo.agentName}`;
+            keyboard = buttons.memberKeyboard();
+            break;
+            
+          default:
+            welcomeMessage = `🤖 Welcome to Interactive Bot!\n\nHi ${ctx.from.first_name}! I'm your interactive Telegram bot.\n\n🔹 I can send you images\n🔹 I can show interactive buttons\n🔹 I can respond to your choices\n🔹 I can send you different types of content\n\nTo access full features, please login or contact an agent to be added as a member.`;
+            keyboard = buttons.welcomeKeyboard();
+        }
+
+        await ctx.editMessageText(welcomeMessage, { reply_markup: keyboard });
         break;
       default:
         await ctx.answerCbQuery('Unknown action!');

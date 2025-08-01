@@ -1,6 +1,8 @@
 const buttons = require('../services/buttons');
+const BotHelper = require('../services/botHelper');
 
 module.exports = (botA, botB) => {
+  const botHelper = new BotHelper(botA, botB);
   // Bot A: Simple welcome and login
   botA.start(async (ctx) => {
     const welcomeMessage = `🔐 Welcome to Login Bot!\n\nHi ${ctx.from.first_name}! This is Bot A - your entry point.\n\n🔹 Click "Login" to access the main features\n🔹 All games, galleries, and features are in Bot B\n🔹 You'll be redirected to the main bot after login\n\nReady to get started?`;
@@ -56,14 +58,24 @@ module.exports = (botA, botB) => {
     switch (action) {
       case 'login_to_bot_b':
         try {
+          const userId = ctx.from.id;
+          const firstName = ctx.from.first_name;
+          
+          // Try to automatically start Bot B for the user
+          const autoStarted = await botHelper.autoStartBotB(userId, firstName);
+          
           // Send a message with a direct link to Bot B
-          await ctx.reply('🔐 Login successful! Click the button below to access the main bot with all features:', {
+          const loginMessage = autoStarted 
+            ? '🔐 Login successful! You have been automatically logged in to the main bot. Click below to access all features:'
+            : '🔐 Login successful! Click the button below to access the main bot with all features:';
+            
+          await ctx.reply(loginMessage, {
             reply_markup: {
               inline_keyboard: [
                 [
                   { 
                     text: '🤖 Go to Main Bot (Bot B)', 
-                    url: 'https://t.me/Hippo99bot?start=from_login' 
+                    url: botHelper.getBotBLoginUrl()
                   }
                 ],
                 [
