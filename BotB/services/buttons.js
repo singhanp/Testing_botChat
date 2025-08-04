@@ -5,14 +5,11 @@ module.exports = {
   welcomeKeyboard: () => Markup.inlineKeyboard([
     [
       Markup.button.callback('🚀 Start Demo', 'start_demo'),
-      Markup.button.callback('📋 Show Menu', 'show_menu')
+      Markup.button.callback('📋 GameList', 'gamelist')
     ],
     [
       Markup.button.callback('🖼️ Gallery', 'gallery'),
       Markup.button.callback('❓ Help', 'help')
-    ],
-    [
-      Markup.button.callback('⚙️ Login', 'login'),
     ],
   ]).reply_markup,
 

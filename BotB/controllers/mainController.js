@@ -340,7 +340,7 @@ module.exports = (bot, scheduler, botB = null) => {
       case 'login':
         await login.handleLogin(ctx);
         break;
-      case 'show_menu':
+      case 'gamelist':
         await menu.handleMenu(ctx);
         break;
       case 'help':
