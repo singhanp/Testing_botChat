@@ -3,7 +3,7 @@
     "chatId": 1792802789,
     "firstName": "Han",
     "lastName": "",
-    "goodMorningEnabled": true,
+    "goodMorningEnabled": false,
     "joinedAt": "2025-07-22T13:34:42.299Z",
     "lastUpdated": "2025-07-23T01:20:48.978Z"
   },
@@ -19,7 +19,7 @@
     "chatId": 5445993412,
     "firstName": "Kong",
     "lastName": "Seh Len",
-    "goodMorningEnabled": true,
+    "goodMorningEnabled": false,
     "joinedAt": "2025-07-24T04:06:54.958Z",
     "lastUpdated": "2025-07-24T04:06:54.958Z"
   },
@@ -27,7 +27,7 @@
     "chatId": 7518041177,
     "firstName": "Yuven Raj",
     "lastName": "",
-    "goodMorningEnabled": true,
+    "goodMorningEnabled": false,
     "joinedAt": "2025-07-29T06:53:30.321Z",
     "lastUpdated": "2025-07-29T06:53:30.322Z"
   }
