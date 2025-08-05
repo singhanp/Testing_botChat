@@ -4,7 +4,7 @@ const help = require('./help');
 const gallery = require('./gallery');
 const demo = require('./demo');
 const home = require('./home');
-const menu = require('./menu');
+const menu = require('./gamelist');
 const login = require('./login');
 
 module.exports = (bot, scheduler, botB = null) => {
