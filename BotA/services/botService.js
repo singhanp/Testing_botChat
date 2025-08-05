@@ -21,6 +21,26 @@ class BotService {
     }
   }
 
+  // Find bot by agent ID
+  async findBotByAgentId(agentId) {
+    try {
+      return await Bot.findOne({ agentId: agentId, isActive: true });
+    } catch (error) {
+      console.error('Error finding bot by agent ID:', error);
+      throw error;
+    }
+  }
+
+  // Find all bots by agent ID
+  async findBotsByAgentId(agentId) {
+    try {
+      return await Bot.find({ agentId: agentId, isActive: true });
+    } catch (error) {
+      console.error('Error finding bots by agent ID:', error);
+      throw error;
+    }
+  }
+
   // Find bot by registered user ID
   async findBotsByUser(userId) {
     try {
@@ -102,6 +122,17 @@ class BotService {
       return !!bot;
     } catch (error) {
       console.error('Error checking token existence:', error);
+      throw error;
+    }
+  }
+
+  // Check if agent ID already has a registered bot
+  async isAgentIdRegistered(agentId) {
+    try {
+      const bot = await Bot.findOne({ agentId: agentId, isActive: true });
+      return !!bot;
+    } catch (error) {
+      console.error('Error checking agent ID registration:', error);
       throw error;
     }
   }

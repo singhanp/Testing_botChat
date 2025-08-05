@@ -18,12 +18,12 @@ class Register {
     
     // Initialize registration session
     this.registrationSessions.set(userId, {
-      step: 'waiting_for_email',
+      step: 'waiting_for_agent_id_and_email',
       data: {},
       startTime: Date.now()
     });
     
-    await ctx.reply('🤖 Welcome to Bot Registration!\n\nPlease enter your email address:');
+    await ctx.reply('Please submit your Agent ID and Email Address');
   }
 
   /**
@@ -47,8 +47,11 @@ class Register {
     const text = ctx.message.text;
     
     switch (session.step) {
-      case 'waiting_for_email':
-        return await this.handleEmailInput(ctx, text, session);
+      case 'waiting_for_agent_id_and_email':
+        return await this.handleAgentIdAndEmailInput(ctx, text, session);
+        
+      case 'waiting_for_otp':
+        return await this.handleOtpInput(ctx, text, session);
         
       case 'waiting_for_bot_name':
         return await this.handleBotNameInput(ctx, text, session);
@@ -62,31 +65,64 @@ class Register {
   }
 
   /**
-   * Handle email input
+   * Handle Agent ID and Email input
    * @param {Object} ctx - Telegram context
-   * @param {string} email - Email input
+   * @param {string} input - Agent ID and Email input
    * @param {Object} session - Registration session
    * @returns {Promise<Object|null>}
    */
-  async handleEmailInput(ctx, email, session) {
+  async handleAgentIdAndEmailInput(ctx, input, session) {
+    const lines = input.trim().split('\n').map(line => line.trim()).filter(line => line);
+    
+    if (lines.length !== 2) {
+      await ctx.reply('Please provide both Agent ID and Email Address (one per line):\n\nExample:\nAGENT123\nuser@example.com');
+      return null;
+    }
+
+    const [agentId, email] = lines;
+
     // Validate email format
     if (!this.isValidEmail(email)) {
-      await ctx.reply('❌ Please enter a valid email address:');
+      await ctx.reply('Invalid email format. Please provide valid Agent ID and Email Address:');
       return null;
     }
 
     // Check if email is already registered
     const emailExists = await botService.isEmailRegistered(email);
     if (emailExists) {
-      await ctx.reply('❌ This email is already registered. Please use a different email address:');
+      await ctx.reply('This email is already registered. Please use a different email address.');
       return null;
     }
 
-    // Save email and move to next step
+    // Save agent ID and email, move to OTP verification
+    session.data.agentId = agentId;
     session.data.email = email.toLowerCase();
+    session.step = 'waiting_for_otp';
+    
+    await ctx.reply('We sent you OTP to your email, please reply OTP for verification ( Under Construction )\n\nDefault for Staging: 8888888 ( 7 digit )');
+    return null;
+  }
+
+  /**
+   * Handle OTP input
+   * @param {Object} ctx - Telegram context
+   * @param {string} otp - OTP input
+   * @param {Object} session - Registration session
+   * @returns {Promise<Object|null>}
+   */
+  async handleOtpInput(ctx, otp, session) {
+    const otpCode = otp.trim();
+    
+    // For staging, accept default OTP
+    if (otpCode !== '8888888') {
+      await ctx.reply('Invalid OTP. Please try again with the 7-digit code:');
+      return null;
+    }
+
+    // OTP verified, move to bot name collection
     session.step = 'waiting_for_bot_name';
     
-    await ctx.reply('✅ Email is valid!\n\nNow please enter a name for your bot (3-32 characters):');
+    await ctx.reply('Email verified successfully!\n\nPlease enter a name for your bot (3-32 characters):');
     return null;
   }
 
@@ -100,19 +136,20 @@ class Register {
   async handleBotNameInput(ctx, botName, session) {
     // Validate bot name
     if (!this.isValidBotName(botName)) {
-      await ctx.reply('❌ Bot name must be between 3 and 32 characters and can only contain letters, numbers, spaces, and underscores. Please try again:');
+      await ctx.reply('Bot name must be between 3 and 32 characters and can only contain letters, numbers, spaces, and underscores. Please try again:');
       return null;
     }
 
-    // Save bot name and move to next step
+    // Save bot name and move to token collection
     session.data.botName = botName;
     session.step = 'waiting_for_token';
     
-    const tokenGuide = `✅ Bot name "${botName}" is valid!\n\nNow I need your bot's access token.\n\n📋 **How to get your bot token:**\n\n1️⃣ Open Telegram and search for "@BotFather"\n2️⃣ Start a chat with BotFather\n3️⃣ Send /newbot command\n4️⃣ Follow the instructions to create your bot\n5️⃣ BotFather will give you a token like:\n   \`1234567890:ABCdefGHIjklMNOpqrsTUVwxyz\`\n\n6️⃣ Copy the token and paste it here\n\n⚠️ **Important:** Never share your token with anyone!\n\nPlease paste your bot token:`;
+    const tokenGuide = `Bot name "${botName}" is valid!\n\nNow I need your bot's access token.\n\nHow to get your bot token:\n\n1. Open Telegram and search for "@BotFather"\n2. Start a chat with BotFather\n3. Send /newbot command\n4. Follow the instructions to create your bot\n4. Send "${botName}" as your bot name\n5. Send "${botName}_bot" as your bot username\n6. BotFather will give you a token like:\n   1234567890:ABCdefGHIjklMNOpqrsTUVwxyz\n\nImportant: Never share your token with anyone!\n\nPlease paste your bot token:`;
     
-    await ctx.reply(tokenGuide, { parse_mode: 'Markdown' });
+    await ctx.reply(tokenGuide);
     return null;
   }
+
 
   /**
    * Handle token input
@@ -145,6 +182,7 @@ class Register {
         // Save the bot to database
         const savedBot = await botService.createBot({
           email: session.data.email,
+          agentId: session.data.agentId,
           botName: session.data.botName,
           botToken: token,
           botUsername: validationResult.botInfo.username,
@@ -160,28 +198,10 @@ class Register {
         // Clear registration session
         this.registrationSessions.delete(ctx.from.id);
         
-        // Create success message with optional warning
-        let successMessage = `✅ **Registration Successful!**\n\n📧 **Email:** ${session.data.email}\n🤖 **Bot Name:** ${session.data.botName}\n👤 **Bot Username:** @${validationResult.botInfo.username}\n🆔 **Bot ID:** ${validationResult.botInfo.id}\n📅 **Registered:** ${new Date().toLocaleString()}`;
+        // Create success message
+        const successMessage = `Registration Successful!\n\nBot Username: @${validationResult.botInfo.username}\nBot ID: ${validationResult.botInfo.id}\nRegistered: ${new Date().toLocaleString()}\n\nYour bot is now registered and ready to use!\n\nYou can proceed to your business now.\nYou may ask your member add @${validationResult.botInfo.username}`;
         
-        // Add warning if bot is not running
-        if (validationResult.warning) {
-          successMessage += `\n\n⚠️ **Note:** ${validationResult.warning}`;
-        }
-        
-        successMessage += `\n\nYour bot is now registered and ready to use!\n\nYou can now:\n• Start your bot with /start\n• Send messages to your bot\n• Use all bot features\n• Manage your bot settings\n\n🎉 Congratulations on creating your Telegram bot!`;
-        
-        await ctx.reply(successMessage, {
-          reply_markup: {
-            inline_keyboard: [
-              [
-                { text: '🔐 Login to Main Bot', callback_data: 'login_to_bot_b' }
-              ],
-              [
-                { text: '🏠 Back to Main Menu', callback_data: 'back_to_main' }
-              ]
-            ]
-          }
-        });
+        await ctx.reply(successMessage);
         
         return { success: true, bot: savedBot };
         

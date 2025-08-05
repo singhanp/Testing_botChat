@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 
 const botSchema = new mongoose.Schema({
+  agentId: {
+    type: String,
+    required: true,
+    trim: true,
+    index: true
+  },
   email: {
     type: String,
     required: true,
@@ -64,6 +70,7 @@ botSchema.pre('save', function(next) {
 });
 
 // Index for efficient queries
+botSchema.index({ agentId: 1, isActive: 1 });
 botSchema.index({ email: 1, isActive: 1 });
 botSchema.index({ botToken: 1, isActive: 1 });
 botSchema.index({ registeredBy: 1 });
