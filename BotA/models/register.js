@@ -170,7 +170,18 @@ class Register {
         
         successMessage += `\n\nYour bot is now registered and ready to use!\n\nYou can now:\n• Start your bot with /start\n• Send messages to your bot\n• Use all bot features\n• Manage your bot settings\n\n🎉 Congratulations on creating your Telegram bot!`;
         
-        await ctx.reply(successMessage);
+        await ctx.reply(successMessage, {
+          reply_markup: {
+            inline_keyboard: [
+              [
+                { text: '🔐 Login to Main Bot', callback_data: 'login_to_bot_b' }
+              ],
+              [
+                { text: '🏠 Back to Main Menu', callback_data: 'back_to_main' }
+              ]
+            ]
+          }
+        });
         
         return { success: true, bot: savedBot };
         
