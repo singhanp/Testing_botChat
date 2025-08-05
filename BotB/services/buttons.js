@@ -5,7 +5,7 @@ module.exports = {
   welcomeKeyboard: () => Markup.inlineKeyboard([
     [
       Markup.button.callback('🚀 Start Demo', 'start_demo'),
-      Markup.button.callback('📋 GameList', 'gamelist')
+      Markup.button.callback('🎮 Games', 'game_menu')
     ],
     [
       Markup.button.callback('🖼️ Gallery', 'gallery'),
@@ -44,7 +44,7 @@ module.exports = {
       Markup.button.callback('📤 Send Message', 'send_to_members')
     ],
     [
-      Markup.button.callback('🎮 Games', 'games'),
+      Markup.button.callback('🎮 Game Center', 'game_menu'),
       Markup.button.callback('🖼️ Gallery', 'gallery')
     ],
     [
@@ -56,12 +56,12 @@ module.exports = {
   // Member keyboard
   memberKeyboard: () => Markup.inlineKeyboard([
     [
-      Markup.button.callback('🎮 Play Games', 'play_games'),
+      Markup.button.callback('🎮 Game Center', 'game_menu'),
       Markup.button.callback('📊 My Stats', 'my_stats')
     ],
     [
       Markup.button.callback('🖼️ Gallery', 'gallery'),
-      Markup.button.callback('🎲 Quick Games', 'quick_games')
+      Markup.button.callback('🎲 Quick Play', 'quick_play')
     ],
     [
       Markup.button.callback('⚙️ Settings', 'member_settings'),

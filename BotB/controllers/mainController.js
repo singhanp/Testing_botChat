@@ -4,7 +4,7 @@ const help = require('./help');
 const gallery = require('./gallery');
 const demo = require('./demo');
 const home = require('./home');
-const menu = require('./gamelist');
+const game = require('./game');
 const login = require('./login');
 
 module.exports = (bot, scheduler, botB = null) => {
@@ -119,7 +119,6 @@ module.exports = (bot, scheduler, botB = null) => {
   help(bot);
   gallery(bot);
   demo(bot);
-  menu(bot);
 
   // Role-based commands
   bot.command('myrole', async (ctx) => {
@@ -340,8 +339,11 @@ module.exports = (bot, scheduler, botB = null) => {
       case 'login':
         await login.handleLogin(ctx);
         break;
-      case 'gamelist':
-        await menu.handleMenu(ctx);
+      case 'game_menu':
+        await game.handleGameMenu(ctx);
+        break;
+      case 'quick_play':
+        await game.handleQuickPlay(ctx);
         break;
       case 'help':
         await help.handleHelp(ctx);
@@ -366,9 +368,7 @@ module.exports = (bot, scheduler, botB = null) => {
         break;
       case 'play_games':
         if (userRole === 'member') {
-          await ctx.reply('🎮 Games Menu\n\nChoose a game to play:', {
-            reply_markup: buttons.gamesKeyboard()
-          });
+          await game.handleGameMenu(ctx);
         } else {
           await ctx.reply('❌ Access denied. Members only.');
         }
@@ -456,7 +456,15 @@ module.exports = (bot, scheduler, botB = null) => {
         await ctx.editMessageText(welcomeMessage, { reply_markup: keyboard });
         break;
       default:
-        await ctx.answerCbQuery('Unknown action!');
+        // Handle game list pagination
+        if (action.startsWith('game_list_page_')) {
+          const page = parseInt(action.replace('game_list_page_', ''));
+          await game.handleGameList(ctx, page);
+        } else if (action === 'page_info') {
+          await ctx.answerCbQuery('Page information');
+        } else {
+          await ctx.answerCbQuery('Unknown action!');
+        }
     }
     // Always answer the callback to remove the loading state
     await ctx.answerCbQuery();
