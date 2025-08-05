@@ -7,19 +7,19 @@ module.exports = (botA, botB) => {
   const botHelper = new BotHelper(botA, botB);
   // Bot A: Simple welcome and login
   botA.start(async (ctx) => {
-    const welcomeMessage = `🔐 Welcome to Login Bot!\n\nHi ${ctx.from.first_name}! This is Bot A - your entry point.\n\n🔹 Click "Login" to access the main features\n🔹 All games, galleries, and features are in Bot B\n🔹 You'll be redirected to the main bot after login\n\nReady to get started?`;
+    const welcomeMessage = `- Welcome to UG Telegram Bot System`;
     
     await ctx.reply(welcomeMessage, {
       reply_markup: {
         inline_keyboard: [
           [
-            { text: '🔐 Login to Main Bot', callback_data: 'login_to_bot_b' }
+            { text: 'Login to Main Bot', callback_data: 'login_to_bot_b' }
           ],
           [
-            { text: '📝 Register New Bot', callback_data: 'register_bot' }
+            { text: 'Register New Bot', callback_data: 'register_bot' }
           ],
           [
-            { text: '❓ Help', callback_data: 'help_bot_a' }
+            { text: 'Help', callback_data: 'help_bot_a' }
           ]
         ]
       }
@@ -64,12 +64,12 @@ module.exports = (botA, botB) => {
               inline_keyboard: [
                 [
                   { 
-                    text: '🤖 Go to Main Bot (Bot B)', 
+                    text: 'Go to Main Bot (Bot B)', 
                     url: botHelper.getBotBLoginUrl()
                   }
                 ],
                 [
-                  { text: '📋 What\'s Available?', callback_data: 'show_features' }
+                  { text: 'What\'s Available?', callback_data: 'show_features' }
                 ]
               ]
             }
@@ -91,10 +91,10 @@ module.exports = (botA, botB) => {
         reply_markup: {
           inline_keyboard: [
             [
-              { text: '🔐 Login to Main Bot', callback_data: 'login_to_bot_b' }
+              { text: 'Login to Main Bot', callback_data: 'login_to_bot_b' }
             ],
             [
-              { text: '📝 Register New Bot', callback_data: 'register_bot' }
+              { text: 'Register New Bot', callback_data: 'register_bot' }
             ]
           ]
         }
@@ -105,13 +105,13 @@ module.exports = (botA, botB) => {
         reply_markup: {
           inline_keyboard: [
             [
-              { text: '🔐 Login to Main Bot', callback_data: 'login_to_bot_b' }
+              { text: 'Login to Main Bot', callback_data: 'login_to_bot_b' }
             ],
             [
-              { text: '📝 Register New Bot', callback_data: 'register_bot' }
+              { text: 'Register New Bot', callback_data: 'register_bot' }
             ],
             [
-              { text: '❓ Help', callback_data: 'help_bot_a' }
+              { text: 'Help', callback_data: 'help_bot_a' }
             ]
           ]
         }
@@ -180,10 +180,10 @@ module.exports = (botA, botB) => {
           reply_markup: {
             inline_keyboard: [
               [
-                { text: '🔐 Login to Main Bot', callback_data: 'login_to_bot_b' }
+                { text: 'Login to Main Bot', callback_data: 'login_to_bot_b' }
               ],
               [
-                { text: '📝 Register New Bot', callback_data: 'register_bot' }
+                { text: 'Register New Bot', callback_data: 'register_bot' }
               ]
             ]
           }
@@ -191,7 +191,7 @@ module.exports = (botA, botB) => {
         break;
         
       case 'back_to_main':
-        const welcomeMessage = `🔐 Welcome to Login Bot!\n\nHi ${ctx.from.first_name}! This is Bot A - your entry point.\n\n🔹 Click "Login" to access the main features\n🔹 Click "Register" to add a new bot\n🔹 All games, galleries, and features are in Bot B\n\nReady to get started?`;
+        const welcomeMessage = `- Welcome to UG Telegram Bot System`;
         
         await ctx.reply(welcomeMessage, {
           reply_markup: {

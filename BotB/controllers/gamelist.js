@@ -12,7 +12,7 @@ async function handleMenu(ctx) {
       return;
     }
 
-    const intro = `🎮 *Game Menu*\n\nWelcome! Here are ${games.length} fun games you can play. Select a game below to get started!`;
+    const intro = `Welcome ${ctx.from.first_name}!\n\nPlease select an action from the options below.`;
     
     // Arrange buttons two per row
     const gameButtons = [];
@@ -20,7 +20,7 @@ async function handleMenu(ctx) {
       const row = [];
       for (let j = i; j < i + 2 && j < games.length; j++) {
         row.push({ 
-          text: `${games[j].emoji} ${games[j].name}`, 
+          text: games[j].name, 
           url: games[j].url 
         });
       }
@@ -28,7 +28,7 @@ async function handleMenu(ctx) {
     }
     
     // Add a back button (callback)
-    gameButtons.push([{ text: '🏠 Back to Main', callback_data: 'back_to_main' }]);
+    gameButtons.push([{ text: 'Back to Main', callback_data: 'back_to_main' }]);
     
     await ctx.replyWithMarkdown(intro, {
       reply_markup: {
@@ -46,7 +46,7 @@ async function handleMenu(ctx) {
       '❌ *Error Loading Games*\n\nSorry, there was an error loading the games. Please try again later.',
       {
         reply_markup: {
-          inline_keyboard: [[{ text: '🏠 Back to Main', callback_data: 'back_to_main' }]]
+          inline_keyboard: [[{ text: 'Back to Main', callback_data: 'back_to_main' }]]
         }
       }
     );

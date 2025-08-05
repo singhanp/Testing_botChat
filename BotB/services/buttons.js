@@ -4,13 +4,16 @@ module.exports = {
   // Welcome keyboard for guests/new users
   welcomeKeyboard: () => Markup.inlineKeyboard([
     [
-      Markup.button.callback('🚀 Start Demo', 'start_demo'),
-      Markup.button.callback('🎮 Games', 'game_menu')
+      Markup.button.callback('Play Games', 'game_menu'),
+      Markup.button.callback('Check Balance', 'check_balance')
     ],
     [
-      Markup.button.callback('🖼️ Gallery', 'gallery'),
-      Markup.button.callback('❓ Help', 'help')
+      Markup.button.callback('Deposit', 'deposit'),
+      Markup.button.callback('Withdraw', 'withdraw')
     ],
+    [
+      Markup.button.callback('Logout', 'logout')
+    ]
   ]).reply_markup,
 
   // Super Admin keyboard
@@ -24,11 +27,6 @@ module.exports = {
       Markup.button.callback('📤 Broadcast', 'broadcast_message')
     ],
     [
-      Markup.button.callback('🚀 Demo', 'start_demo'),
-      Markup.button.callback('🖼️ Gallery', 'gallery')
-    ],
-    [
-      Markup.button.callback('❓ Help', 'help'),
       Markup.button.callback('🏠 Main Menu', 'back_to_main')
     ]
   ]).reply_markup,
@@ -45,10 +43,6 @@ module.exports = {
     ],
     [
       Markup.button.callback('🎮 Game Center', 'game_menu'),
-      Markup.button.callback('🖼️ Gallery', 'gallery')
-    ],
-    [
-      Markup.button.callback('❓ Help', 'help'),
       Markup.button.callback('🏠 Main Menu', 'back_to_main')
     ]
   ]).reply_markup,
@@ -60,66 +54,15 @@ module.exports = {
       Markup.button.callback('📊 My Stats', 'my_stats')
     ],
     [
-      Markup.button.callback('🖼️ Gallery', 'gallery'),
-      Markup.button.callback('🎲 Quick Play', 'quick_play')
-    ],
-    [
-      Markup.button.callback('⚙️ Settings', 'member_settings'),
-      Markup.button.callback('❓ Help', 'help')
+      Markup.button.callback('🎲 Quick Play', 'quick_play'),
+      Markup.button.callback('⚙️ Settings', 'member_settings')
     ],
     [
       Markup.button.callback('🏠 Main Menu', 'back_to_main')
     ]
   ]).reply_markup,
 
-  // Help keyboard (role-based)
-  helpKeyboard: (role = 'guest') => {
-    const baseButtons = [
-      [
-        Markup.button.callback('🚀 Demo', 'start_demo'),
-        Markup.button.callback('🖼️ Gallery', 'gallery')
-      ]
-    ];
 
-    if (role === 'super_admin') {
-      baseButtons.unshift([
-        Markup.button.callback('👥 Manage Agents', 'manage_agents'),
-        Markup.button.callback('📊 System Stats', 'system_stats')
-      ]);
-    } else if (role === 'agent') {
-      baseButtons.unshift([
-        Markup.button.callback('👥 Manage Members', 'manage_members'),
-        Markup.button.callback('📊 Agent Stats', 'agent_stats')
-      ]);
-    } else if (role === 'member') {
-      baseButtons.unshift([
-        Markup.button.callback('🎮 Play Games', 'play_games'),
-        Markup.button.callback('📊 My Stats', 'my_stats')
-      ]);
-    }
-
-    baseButtons.push([
-      Markup.button.callback('🏠 Back to Main', 'back_to_main')
-    ]);
-
-    return Markup.inlineKeyboard(baseButtons).reply_markup;
-  },
-
-  // Demo keyboard
-  demoKeyboard: () => Markup.inlineKeyboard([
-    [
-      Markup.button.callback('👍 Like', 'like_image'),
-      Markup.button.callback('💬 Comment', 'comment_image'),
-      Markup.button.callback('📤 Share', 'share_image')
-    ],
-    [
-      Markup.button.callback('🔄 New Image', 'new_image'),
-      Markup.button.callback('📊 Stats', 'image_stats')
-    ],
-    [
-      Markup.button.callback('🏠 Main Menu', 'back_to_main')
-    ]
-  ]).reply_markup,
 
   // Agent management keyboard
   agentManagementKeyboard: () => Markup.inlineKeyboard([

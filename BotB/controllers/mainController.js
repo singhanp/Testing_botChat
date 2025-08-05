@@ -1,8 +1,5 @@
 const { authService, getUserRole, getUserInfo } = require('../services/auth');
 const buttons = require('../services/buttons');
-const help = require('./help');
-const gallery = require('./gallery');
-const demo = require('./demo');
 const home = require('./home');
 const game = require('./game');
 const login = require('./login');
@@ -26,28 +23,28 @@ module.exports = (bot, scheduler, botB = null) => {
 
     switch (userRole) {
       case 'super_admin':
-        welcomeMessage = `👑 Welcome Super Admin ${ctx.from.first_name}!\n\n🔹 You have full system access\n🔹 Manage all agents and members\n🔹 View system-wide statistics\n🔹 Configure system settings\n\nWhat would you like to do?`;
+        welcomeMessage = `Welcome ${ctx.from.first_name}!\n\nPlease select an action from the options below.`;
         keyboard = buttons.superAdminKeyboard();
         break;
         
       case 'agent':
-        welcomeMessage = `👨‍💼 Welcome Agent ${ctx.from.first_name}!\n\n🔹 Manage your team members\n🔹 View your agent statistics\n🔹 Send messages to your members\n🔹 Configure your agent settings\n\nYour Agent Name: ${userInfo.agentName}`;
+        welcomeMessage = `Welcome ${ctx.from.first_name}!\n\nPlease select an action from the options below.`;
         keyboard = buttons.agentKeyboard(userInfo.agentName);
         break;
         
       case 'member':
-        welcomeMessage = `🎮 Welcome ${ctx.from.first_name}!\n\n🔹 Play games and earn points\n🔹 View your personal statistics\n🔹 Browse image galleries\n🔹 Customize your preferences\n\nYour Agent: ${userInfo.agentInfo.agentName}`;
+        welcomeMessage = `Welcome ${ctx.from.first_name}!\n\nPlease select an action from the options below.`;
         keyboard = buttons.memberKeyboard();
         break;
         
       default: // guest
-        welcomeMessage = `🤖 Welcome to Interactive Bot!\n\nHi ${ctx.from.first_name}! I'm your interactive Telegram bot.\n\n🔹 I can send you images\n🔹 I can show interactive buttons\n🔹 I can respond to your choices\n🔹 I can send you different types of content\n\nTo access full features, please login or contact an agent to be added as a member.`;
+        welcomeMessage = `Welcome ${ctx.from.first_name}!\n\nPlease select an action from the options below.`;
         keyboard = buttons.welcomeKeyboard();
     }
 
     // Add special message if coming from login
     if (isFromLogin) {
-      welcomeMessage = `🎉 Welcome from Login!\n\n${welcomeMessage}\n\n✅ You have successfully logged in from Bot A!`;
+      welcomeMessage = `Welcome from Login!\n\n${welcomeMessage}\n\nYou have successfully logged in from Bot A!`;
     }
 
     await ctx.reply(welcomeMessage, { reply_markup: keyboard });
@@ -66,7 +63,7 @@ module.exports = (bot, scheduler, botB = null) => {
     
     // If user has a role but this might be their first interaction
     if (userRole !== 'guest') {
-      const welcomeMessage = `🎉 Welcome ${ctx.from.first_name}! I see you have access to the system.\n\nUse /start to see your personalized interface based on your role (${userRole}).`;
+      const welcomeMessage = `Welcome ${ctx.from.first_name}!\n\nPlease select an action from the options below.`;
       await ctx.reply(welcomeMessage, {
         reply_markup: {
           inline_keyboard: [
@@ -78,7 +75,7 @@ module.exports = (bot, scheduler, botB = null) => {
       });
     } else {
       // Guest user - show basic welcome
-      await ctx.reply(`👋 Hello ${ctx.from.first_name}! Welcome to the main bot.\n\nUse /start to see available features or contact an agent to get full access.`);
+      await ctx.reply(`Welcome ${ctx.from.first_name}!\n\nPlease select an action from the options below.`);
     }
   });
 
@@ -92,23 +89,23 @@ module.exports = (bot, scheduler, botB = null) => {
 
     switch (userRole) {
       case 'super_admin':
-        responseMessage = `👑 Hello Super Admin ${ctx.from.first_name}! How can I assist you today?`;
+        responseMessage = `Welcome ${ctx.from.first_name}!\n\nPlease select an action from the options below.`;
         keyboard = buttons.superAdminKeyboard();
         break;
         
       case 'agent':
         const agentInfo = await getUserInfo(userId);
-        responseMessage = `👨‍💼 Hello Agent ${ctx.from.first_name}! Ready to manage your team?`;
+        responseMessage = `Welcome ${ctx.from.first_name}!\n\nPlease select an action from the options below.`;
         keyboard = buttons.agentKeyboard(agentInfo.agentName);
         break;
         
       case 'member':
-        responseMessage = `🎮 Hello ${ctx.from.first_name}! Ready to play some games?`;
+        responseMessage = `Welcome ${ctx.from.first_name}!\n\nPlease select an action from the options below.`;
         keyboard = buttons.memberKeyboard();
         break;
         
       default:
-        responseMessage = `🤖 Hello ${ctx.from.first_name}! Welcome to our interactive bot!`;
+        responseMessage = `Welcome ${ctx.from.first_name}!\n\nPlease select an action from the options below.`;
         keyboard = buttons.welcomeKeyboard();
     }
 
@@ -116,9 +113,7 @@ module.exports = (bot, scheduler, botB = null) => {
   });
 
   // Register separated controllers
-  help(bot);
-  gallery(bot);
-  demo(bot);
+  // Removed: help, gallery, demo controllers
 
   // Role-based commands
   bot.command('myrole', async (ctx) => {
@@ -142,7 +137,7 @@ module.exports = (bot, scheduler, botB = null) => {
         break;
         
       default:
-        roleMessage += `👤 You are a Guest\n🔹 Limited access to features\n🔹 Contact an agent to become a member\n🔹 Basic demo and gallery access`;
+        roleMessage += `👤 You are a Guest\n🔹 Limited access to features\n🔹 Contact an agent to become a member\n🔹 Basic game access available`;
     }
     
     await ctx.reply(roleMessage);
@@ -330,12 +325,6 @@ module.exports = (bot, scheduler, botB = null) => {
     const userRole = await getUserRole(userId);
     
     switch (action) {
-      case 'start_demo':
-        await demo.handleDemo(ctx);
-        break;
-      case 'gallery':
-        await gallery.handleGallery(ctx);
-        break;
       case 'login':
         await login.handleLogin(ctx);
         break;
@@ -345,8 +334,17 @@ module.exports = (bot, scheduler, botB = null) => {
       case 'quick_play':
         await game.handleQuickPlay(ctx);
         break;
-      case 'help':
-        await help.handleHelp(ctx);
+      case 'check_balance':
+        await ctx.reply('💰 Balance: $0.00\n\nThis is a dummy balance display. Your account balance will be shown here.');
+        break;
+      case 'deposit':
+        await ctx.reply('💳 Deposit\n\nThis is a dummy deposit function. Deposit functionality will be implemented here.');
+        break;
+      case 'withdraw':
+        await ctx.reply('💸 Withdraw\n\nThis is a dummy withdraw function. Withdrawal functionality will be implemented here.');
+        break;
+      case 'logout':
+        await ctx.reply('🚪 Logout\n\nThis is a dummy logout function. Logout functionality will be implemented here.');
         break;
       case 'manage_agents':
         if (userRole === 'super_admin') {
@@ -397,24 +395,7 @@ module.exports = (bot, scheduler, botB = null) => {
           await ctx.reply('❌ Access denied. Members only.');
         }
         break;
-      case 'like_image':
-        await ctx.reply('👍 You liked the image!');
-        break;
-      case 'comment_image':
-        await ctx.reply('💬 You want to comment!');
-        break;
-      case 'share_image':
-        await ctx.reply('📤 You want to share!');
-        break;
-      case 'new_image':
-        await ctx.reply('🔄 Here is a new image!');
-        break;
-      case 'image_stats':
-        await ctx.reply('📊 Here are the image stats!');
-        break;
-      case 'games':
-        await ctx.reply('🎮 Here are the games!');
-        break;
+
       case 'settings':
         await ctx.reply('⚙️ Here are the settings!', {
           reply_markup: buttons.settingsKeyboard(userRole)
@@ -434,22 +415,22 @@ module.exports = (bot, scheduler, botB = null) => {
 
         switch (userRole) {
           case 'super_admin':
-            welcomeMessage = `👑 Welcome Super Admin ${ctx.from.first_name}!\n\n🔹 You have full system access\n🔹 Manage all agents and members\n🔹 View system-wide statistics\n🔹 Configure system settings\n\nWhat would you like to do?`;
+            welcomeMessage = `Welcome ${ctx.from.first_name}!\n\nPlease select an action from the options below.`;
             keyboard = buttons.superAdminKeyboard();
             break;
             
           case 'agent':
-            welcomeMessage = `👨‍💼 Welcome Agent ${ctx.from.first_name}!\n\n🔹 Manage your team members\n🔹 View your agent statistics\n🔹 Send messages to your members\n🔹 Configure your agent settings\n\nYour Agent Name: ${userInfo.agentName}`;
+            welcomeMessage = `Welcome ${ctx.from.first_name}!\n\nPlease select an action from the options below.`;
             keyboard = buttons.agentKeyboard(userInfo.agentName);
             break;
             
           case 'member':
-            welcomeMessage = `🎮 Welcome ${ctx.from.first_name}!\n\n🔹 Play games and earn points\n🔹 View your personal statistics\n🔹 Browse image galleries\n🔹 Customize your preferences\n\nYour Agent: ${userInfo.agentInfo.agentName}`;
+            welcomeMessage = `Welcome ${ctx.from.first_name}!\n\nPlease select an action from the options below.`;
             keyboard = buttons.memberKeyboard();
             break;
             
           default:
-            welcomeMessage = `🤖 Welcome to Interactive Bot!\n\nHi ${ctx.from.first_name}! I'm your interactive Telegram bot.\n\n🔹 I can send you images\n🔹 I can show interactive buttons\n🔹 I can respond to your choices\n🔹 I can send you different types of content\n\nTo access full features, please login or contact an agent to be added as a member.`;
+            welcomeMessage = `Welcome ${ctx.from.first_name}!\n\nPlease select an action from the options below.`;
             keyboard = buttons.welcomeKeyboard();
         }
 
