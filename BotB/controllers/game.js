@@ -36,14 +36,22 @@ async function handleGameList(ctx, page = 1) {
     const allGames = await gameListAPI.getGames();
     
     if (!allGames || allGames.length === 0) {
-      await ctx.editMessageText('❌ *No games available*\n\nSorry, no games are currently available. Please try again later.', {
+      const noGamesMessage = '❌ *No games available*\n\nSorry, no games are currently available. Please try again later.';
+      const noGamesKeyboard = {
         reply_markup: {
           inline_keyboard: [
-            [{ text: '🔙 Back to Game Menu', callback_data: 'game_menu' }]
+            [{ text: 'Back to Main', callback_data: 'back_to_main' }]
           ]
         },
         parse_mode: 'Markdown'
-      });
+      };
+      
+      try {
+        await ctx.editMessageText(noGamesMessage, noGamesKeyboard);
+      } catch (editError) {
+        // If editing fails (e.g., message is a photo), send a new message
+        await ctx.reply(noGamesMessage, noGamesKeyboard);
+      }
       return;
     }
 
@@ -53,7 +61,7 @@ async function handleGameList(ctx, page = 1) {
     const endIndex = startIndex + gamesPerPage;
     const gamesOnPage = allGames.slice(startIndex, endIndex);
 
-    const intro = `🎮 *Game List* (Page ${page}/${totalPages})\n\nChoose a game to play from the list below:`;
+    const intro = `Game List (Page ${page}/${totalPages})\n\nChoose a game to play from the list below:`;
     
     const gameButtons = [];
     
@@ -62,7 +70,7 @@ async function handleGameList(ctx, page = 1) {
       const row = [];
       for (let j = i; j < i + 2 && j < gamesOnPage.length; j++) {
         row.push({ 
-          text: `${gamesOnPage[j].emoji} ${gamesOnPage[j].name}`, 
+          text: gamesOnPage[j].name, 
           callback_data: `game_detail_${gamesOnPage[j].id}`
         });
       }
@@ -74,11 +82,11 @@ async function handleGameList(ctx, page = 1) {
       const paginationRow = [];
       
       if (page > 1) {
-        paginationRow.push({ text: '⬅️ Previous', callback_data: `game_list_page_${page - 1}` });
+        paginationRow.push({ text: 'Previous', callback_data: `game_list_page_${page - 1}` });
       }
       
       if (page < totalPages) {
-        paginationRow.push({ text: '➡️ Next', callback_data: `game_list_page_${page + 1}` });
+        paginationRow.push({ text: 'Next', callback_data: `game_list_page_${page + 1}` });
       }
       
       if (paginationRow.length > 0) {
@@ -86,39 +94,53 @@ async function handleGameList(ctx, page = 1) {
       }
       
       // Add page indicator
-      gameButtons.push([{ text: `📄 ${page}/${totalPages}`, callback_data: 'page_info' }]);
+      gameButtons.push([{ text: `Page ${page}/${totalPages}`, callback_data: 'page_info' }]);
     }
     
     // Add navigation buttons
     gameButtons.push([
-      { text: '🔙 Back to Game Menu', callback_data: 'game_menu' },
-      { text: '🏠 Main Menu', callback_data: 'back_to_main' }
+      { text: 'Back to Main', callback_data: 'back_to_main' }
     ]);
     
-    await ctx.editMessageText(intro, {
-      reply_markup: {
-        inline_keyboard: gameButtons
-      },
-      parse_mode: 'Markdown'
-    });
+    // Try to edit the message, but if it fails (e.g., editing a photo message), send a new message
+    try {
+      await ctx.editMessageText(intro, {
+        reply_markup: {
+          inline_keyboard: gameButtons
+        },
+        parse_mode: 'Markdown'
+      });
+    } catch (editError) {
+      // If editing fails (e.g., message is a photo), send a new message
+      await ctx.reply(intro, {
+        reply_markup: {
+          inline_keyboard: gameButtons
+        },
+        parse_mode: 'Markdown'
+      });
+    }
     
     console.log(`✅ Successfully displayed ${gamesOnPage.length} games on page ${page}/${totalPages}`);
     
   } catch (error) {
     console.error('❌ Error in handleGameList:', error.message);
     
-    await ctx.editMessageText(
-      '❌ *Error Loading Games*\n\nSorry, there was an error loading the games. Please try again later.',
-      {
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: '🔙 Back to Game Menu', callback_data: 'game_menu' }],
-            [{ text: '🏠 Main Menu', callback_data: 'back_to_main' }]
-          ]
-        },
-        parse_mode: 'Markdown'
-      }
-    );
+    const errorMessage = '❌ *Error Loading Games*\n\nSorry, there was an error loading the games. Please try again later.';
+    const errorKeyboard = {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: 'Back to Main', callback_data: 'back_to_main' }]
+        ]
+      },
+      parse_mode: 'Markdown'
+    };
+    
+    try {
+      await ctx.editMessageText(errorMessage, errorKeyboard);
+    } catch (editError) {
+      // If editing fails (e.g., message is a photo), send a new message
+      await ctx.reply(errorMessage, errorKeyboard);
+    }
   }
 }
 
@@ -127,49 +149,70 @@ async function handleQuickPlay(ctx) {
     const allGames = await gameListAPI.getGames();
     
     if (!allGames || allGames.length === 0) {
-      await ctx.editMessageText('❌ *No games available*\n\nSorry, no games are currently available for quick play.', {
+      const noGamesMessage = '❌ *No games available*\n\nSorry, no games are currently available for quick play.';
+      const noGamesKeyboard = {
         reply_markup: {
           inline_keyboard: [
-            [{ text: '🔙 Back to Game Menu', callback_data: 'game_menu' }]
+            [{ text: 'Back to Main', callback_data: 'back_to_main' }]
           ]
         },
         parse_mode: 'Markdown'
-      });
+      };
+      
+      try {
+        await ctx.editMessageText(noGamesMessage, noGamesKeyboard);
+      } catch (editError) {
+        await ctx.reply(noGamesMessage, noGamesKeyboard);
+      }
       return;
     }
 
     // Select a random game for quick play
     const randomGame = allGames[Math.floor(Math.random() * allGames.length)];
     
-    const quickPlayMessage = `🎲 *Quick Play*\n\nHere's a random game for you to try:\n\n${randomGame.emoji} **${randomGame.name}**\n\nClick the button below to start playing!`;
+    const quickPlayMessage = `Quick Play\n\nHere's a random game for you to try:\n\n**${randomGame.name}**\n\nClick the button below to start playing!`;
     
-    await ctx.editMessageText(quickPlayMessage, {
+    const quickPlayKeyboard = {
       reply_markup: {
         inline_keyboard: [
           [
-            { text: `🚀 Play ${randomGame.name}`, url: randomGame.url }
+            { text: `Play ${randomGame.name}`, url: randomGame.url }
           ],
           [
-            { text: '🎲 Another Random Game', callback_data: 'quick_play' },
-            { text: '📋 View All Games', callback_data: 'game_list_page_1' }
+            { text: 'Another Random Game', callback_data: 'quick_play' },
+            { text: 'View All Games', callback_data: 'game_list_page_1' }
           ],
           [
-            { text: '🔙 Back to Game Menu', callback_data: 'game_menu' }
+            { text: 'Back to Main', callback_data: 'back_to_main' }
           ]
         ]
       },
       parse_mode: 'Markdown'
-    });
+    };
+    
+    try {
+      await ctx.editMessageText(quickPlayMessage, quickPlayKeyboard);
+    } catch (editError) {
+      await ctx.reply(quickPlayMessage, quickPlayKeyboard);
+    }
     
   } catch (error) {
     console.error('❌ Error in handleQuickPlay:', error.message);
-    await ctx.editMessageText('❌ Error loading quick play. Please try again later.', {
+    
+    const errorMessage = '❌ Error loading quick play. Please try again later.';
+    const errorKeyboard = {
       reply_markup: {
         inline_keyboard: [
-          [{ text: '🔙 Back to Game Menu', callback_data: 'game_menu' }]
+          [{ text: 'Back to Main', callback_data: 'back_to_main' }]
         ]
       }
-    });
+    };
+    
+    try {
+      await ctx.editMessageText(errorMessage, errorKeyboard);
+    } catch (editError) {
+      await ctx.reply(errorMessage, errorKeyboard);
+    }
   }
 }
 
@@ -179,14 +222,21 @@ async function handleGameDetail(ctx, gameId) {
     const game = await gameListAPI.getGameById(gameId);
     
     if (!game) {
-      await ctx.editMessageText('❌ *Game Not Found*\n\nSorry, this game is no longer available.', {
+      const notFoundMessage = '❌ *Game Not Found*\n\nSorry, this game is no longer available.';
+      const notFoundKeyboard = {
         reply_markup: {
           inline_keyboard: [
-            [{ text: '🔙 Back to Game List', callback_data: 'game_list_page_1' }]
+            [{ text: 'Back to Game List', callback_data: 'game_list_page_1' }]
           ]
         },
         parse_mode: 'Markdown'
-      });
+      };
+      
+      try {
+        await ctx.editMessageText(notFoundMessage, notFoundKeyboard);
+      } catch (editError) {
+        await ctx.reply(notFoundMessage, notFoundKeyboard);
+      }
       return;
     }
 
@@ -195,18 +245,25 @@ async function handleGameDetail(ctx, gameId) {
     const gameWithDetails = allGames.find(g => g.id.toString() === gameId.toString());
     
     if (!gameWithDetails) {
-      await ctx.editMessageText('❌ *Game Details Not Available*', {
+      const detailsMessage = '❌ *Game Details Not Available*';
+      const detailsKeyboard = {
         reply_markup: {
           inline_keyboard: [
-            [{ text: '🔙 Back to Game List', callback_data: 'game_list_page_1' }]
+            [{ text: 'Back to Game List', callback_data: 'game_list_page_1' }]
           ]
         },
         parse_mode: 'Markdown'
-      });
+      };
+      
+      try {
+        await ctx.editMessageText(detailsMessage, detailsKeyboard);
+      } catch (editError) {
+        await ctx.reply(detailsMessage, detailsKeyboard);
+      }
       return;
     }
 
-    const gameDetailMessage = `🎮 *${gameWithDetails.name}*\n\n${gameWithDetails.description}\n\nReady to play? Click the button below to launch the game!`;
+    const gameDetailMessage = `*${gameWithDetails.name}*\n\n${gameWithDetails.description}\n\nReady to play? Click the button below to launch the game!`;
     
     // Send photo with game details
     await ctx.replyWithPhoto(gameWithDetails.logo, {
@@ -215,13 +272,13 @@ async function handleGameDetail(ctx, gameId) {
         inline_keyboard: [
           [
             { 
-              text: '🚀 Play Now', 
+              text: 'Play Now', 
               web_app: { url: gameWithDetails.miniAppUrl }
             }
           ],
           [
-            { text: '🔙 Back to Game List', callback_data: 'game_list_page_1' },
-            { text: '🏠 Main Menu', callback_data: 'back_to_main' }
+            { text: 'Back to Game List', callback_data: 'game_list_page_1' },
+            { text: 'Back to Main', callback_data: 'back_to_main' }
           ]
         ]
       },
@@ -233,15 +290,22 @@ async function handleGameDetail(ctx, gameId) {
   } catch (error) {
     console.error('❌ Error in handleGameDetail:', error.message);
     
-    await ctx.editMessageText('❌ *Error Loading Game Details*\n\nSorry, there was an error loading the game details. Please try again later.', {
+    const errorMessage = '❌ *Error Loading Game Details*\n\nSorry, there was an error loading the game details. Please try again later.';
+    const errorKeyboard = {
       reply_markup: {
         inline_keyboard: [
-          [{ text: '🔙 Back to Game List', callback_data: 'game_list_page_1' }],
-          [{ text: '🏠 Main Menu', callback_data: 'back_to_main' }]
+          [{ text: 'Back to Game List', callback_data: 'game_list_page_1' }],
+          [{ text: 'Back to Main', callback_data: 'back_to_main' }]
         ]
       },
       parse_mode: 'Markdown'
-    });
+    };
+    
+    try {
+      await ctx.editMessageText(errorMessage, errorKeyboard);
+    } catch (editError) {
+      await ctx.reply(errorMessage, errorKeyboard);
+    }
   }
 }
 

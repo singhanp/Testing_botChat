@@ -329,7 +329,7 @@ module.exports = (bot, scheduler, botB = null) => {
         await login.handleLogin(ctx);
         break;
       case 'game_menu':
-        await game.handleGameMenu(ctx);
+        await game.handleGameList(ctx, 1);
         break;
       case 'quick_play':
         await game.handleQuickPlay(ctx);
