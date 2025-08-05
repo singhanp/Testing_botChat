@@ -57,13 +57,13 @@ async function handleGameList(ctx, page = 1) {
     
     const gameButtons = [];
     
-    // Add game buttons - 2 games per row
+    // Add game buttons - 2 games per row (using callback data instead of URLs)
     for (let i = 0; i < gamesOnPage.length; i += 2) {
       const row = [];
       for (let j = i; j < i + 2 && j < gamesOnPage.length; j++) {
         row.push({ 
           text: `${gamesOnPage[j].emoji} ${gamesOnPage[j].name}`, 
-          url: gamesOnPage[j].url 
+          callback_data: `game_detail_${gamesOnPage[j].id}`
         });
       }
       gameButtons.push(row);
@@ -173,8 +173,81 @@ async function handleQuickPlay(ctx) {
   }
 }
 
+async function handleGameDetail(ctx, gameId) {
+  try {
+    console.log(`🔄 Fetching game details for ID: ${gameId}`);
+    const game = await gameListAPI.getGameById(gameId);
+    
+    if (!game) {
+      await ctx.editMessageText('❌ *Game Not Found*\n\nSorry, this game is no longer available.', {
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: '🔙 Back to Game List', callback_data: 'game_list_page_1' }]
+          ]
+        },
+        parse_mode: 'Markdown'
+      });
+      return;
+    }
+
+    // Get game details with logo
+    const allGames = await gameListAPI.getGames();
+    const gameWithDetails = allGames.find(g => g.id.toString() === gameId.toString());
+    
+    if (!gameWithDetails) {
+      await ctx.editMessageText('❌ *Game Details Not Available*', {
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: '🔙 Back to Game List', callback_data: 'game_list_page_1' }]
+          ]
+        },
+        parse_mode: 'Markdown'
+      });
+      return;
+    }
+
+    const gameDetailMessage = `🎮 *${gameWithDetails.name}*\n\n${gameWithDetails.description}\n\nReady to play? Click the button below to launch the game!`;
+    
+    // Send photo with game details
+    await ctx.replyWithPhoto(gameWithDetails.logo, {
+      caption: gameDetailMessage,
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { 
+              text: '🚀 Play Now', 
+              web_app: { url: gameWithDetails.miniAppUrl }
+            }
+          ],
+          [
+            { text: '🔙 Back to Game List', callback_data: 'game_list_page_1' },
+            { text: '🏠 Main Menu', callback_data: 'back_to_main' }
+          ]
+        ]
+      },
+      parse_mode: 'Markdown'
+    });
+    
+    console.log(`✅ Successfully displayed game details for: ${gameWithDetails.name}`);
+    
+  } catch (error) {
+    console.error('❌ Error in handleGameDetail:', error.message);
+    
+    await ctx.editMessageText('❌ *Error Loading Game Details*\n\nSorry, there was an error loading the game details. Please try again later.', {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: '🔙 Back to Game List', callback_data: 'game_list_page_1' }],
+          [{ text: '🏠 Main Menu', callback_data: 'back_to_main' }]
+        ]
+      },
+      parse_mode: 'Markdown'
+    });
+  }
+}
+
 module.exports = {
   handleGameMenu,
   handleGameList,
-  handleQuickPlay
+  handleQuickPlay,
+  handleGameDetail
 };

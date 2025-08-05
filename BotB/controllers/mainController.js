@@ -460,6 +460,9 @@ module.exports = (bot, scheduler, botB = null) => {
         if (action.startsWith('game_list_page_')) {
           const page = parseInt(action.replace('game_list_page_', ''));
           await game.handleGameList(ctx, page);
+        } else if (action.startsWith('game_detail_')) {
+          const gameId = action.replace('game_detail_', '');
+          await game.handleGameDetail(ctx, gameId);
         } else if (action === 'page_info') {
           await ctx.answerCbQuery('Page information');
         } else {
