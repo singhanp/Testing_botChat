@@ -265,9 +265,7 @@ async function handleGameDetail(ctx, gameId) {
 
     const gameDetailMessage = `*${gameWithDetails.name}*\n\n${gameWithDetails.description}\n\nReady to play? Click the button below to launch the game!`;
     
-    // Send photo with game details
-    await ctx.replyWithPhoto(gameWithDetails.logo, {
-      caption: gameDetailMessage,
+    const gameKeyboard = {
       reply_markup: {
         inline_keyboard: [
           [
@@ -283,7 +281,19 @@ async function handleGameDetail(ctx, gameId) {
         ]
       },
       parse_mode: 'Markdown'
-    });
+    };
+    
+    // Try to send photo with game details, fallback to text if photo fails
+    try {
+      await ctx.replyWithPhoto(gameWithDetails.logo, {
+        caption: gameDetailMessage,
+        ...gameKeyboard
+      });
+    } catch (photoError) {
+      console.log(`⚠️ Failed to load image for ${gameWithDetails.name}, sending text instead`);
+      // If photo fails to load, send as text message instead
+      await ctx.reply(gameDetailMessage, gameKeyboard);
+    }
     
     console.log(`✅ Successfully displayed game details for: ${gameWithDetails.name}`);
     
