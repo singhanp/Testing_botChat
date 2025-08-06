@@ -1,5 +1,3 @@
-const Bot = require('../../BotA/models/Bot');
-
 class UserTrackingService {
   constructor() {
     this.userBotInteractions = new Map(); // Map of userId -> botUsername

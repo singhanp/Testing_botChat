@@ -1,16 +1,32 @@
 const buttons = require('../services/buttons');
 const home = require('./home');
 const game = require('./game');
+const userTrackingService = require('../services/userTrackingService');
 
-module.exports = (bot, scheduler) => {
+module.exports = (bot, scheduler, dynamicBotManager = null) => {
   // Start command - simple welcome for single user
   bot.start(async (ctx) => {
+    const userId = ctx.from.id;
+    const botUsername = ctx.botInfo?.username || 'unknown_bot';
+    const startPayload = ctx.message?.text?.split(' ')[1];
+    
+    // Track start command interaction
+    userTrackingService.logStartInteraction(userId, botUsername, startPayload, ctx);
+    
     const welcomeMessage = `Welcome ${ctx.from.first_name}!\n\nPlease select an action from the options below.`;
     await ctx.reply(welcomeMessage, { reply_markup: buttons.welcomeKeyboard() });
   });
 
   // Handle regular messages
   bot.on('message', async (ctx) => {
+    const userId = ctx.from.id;
+    const botUsername = ctx.botInfo?.username || 'unknown_bot';
+    
+    // Track text message interaction
+    if (ctx.message.text && !ctx.message.text.startsWith('/')) {
+      userTrackingService.logTextInteraction(userId, botUsername, ctx.message.text, ctx);
+    }
+    
     // Skip if it's a command (handled by other handlers)
     if (ctx.message.text && ctx.message.text.startsWith('/')) {
       return;
@@ -32,6 +48,11 @@ module.exports = (bot, scheduler) => {
   // Callback query handler for buttons
   bot.on('callback_query', async (ctx) => {
     const action = ctx.callbackQuery.data;
+    const userId = ctx.from.id;
+    const botUsername = ctx.botInfo?.username || 'unknown_bot';
+    
+    // Track callback interaction
+    userTrackingService.logCallbackInteraction(userId, botUsername, action, ctx);
     
     switch (action) {
       case 'game_menu':
