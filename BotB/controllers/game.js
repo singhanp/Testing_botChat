@@ -1,35 +1,6 @@
 const buttons = require('../services/buttons');
 const gameListAPI = require('../api/gamelistapi');
 
-async function handleGameMenu(ctx) {
-  try {
-    const gameMessage = `🎮 **Game Center**\n\nWelcome to our Game Center! Choose from the options below:`;
-    
-    await ctx.editMessageText(gameMessage, {
-      reply_markup: {
-        inline_keyboard: [
-          [
-            { text: '📋 Game List', callback_data: 'game_list_page_1' },
-            { text: '🎲 Quick Play', callback_data: 'quick_play' }
-          ],
-          [
-            { text: '🏆 Leaderboard', callback_data: 'leaderboard' },
-            { text: '📊 Game Stats', callback_data: 'game_stats' }
-          ],
-          [
-            { text: '🏠 Back to Main', callback_data: 'back_to_main' }
-          ]
-        ]
-      },
-      parse_mode: 'Markdown'
-    });
-    
-  } catch (error) {
-    console.error('❌ Error in handleGameMenu:', error.message);
-    await ctx.reply('❌ Error loading game menu. Please try again later.');
-  }
-}
-
 async function handleGameList(ctx, page = 1) {
   try {
     console.log('🔄 Fetching games from database...');
@@ -144,78 +115,6 @@ async function handleGameList(ctx, page = 1) {
   }
 }
 
-async function handleQuickPlay(ctx) {
-  try {
-    const allGames = await gameListAPI.getGames();
-    
-    if (!allGames || allGames.length === 0) {
-      const noGamesMessage = '❌ *No games available*\n\nSorry, no games are currently available for quick play.';
-      const noGamesKeyboard = {
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: 'Back to Main', callback_data: 'back_to_main' }]
-          ]
-        },
-        parse_mode: 'Markdown'
-      };
-      
-      try {
-        await ctx.editMessageText(noGamesMessage, noGamesKeyboard);
-      } catch (editError) {
-        await ctx.reply(noGamesMessage, noGamesKeyboard);
-      }
-      return;
-    }
-
-    // Select a random game for quick play
-    const randomGame = allGames[Math.floor(Math.random() * allGames.length)];
-    
-    const quickPlayMessage = `Quick Play\n\nHere's a random game for you to try:\n\n**${randomGame.name}**\n\nClick the button below to start playing!`;
-    
-    const quickPlayKeyboard = {
-      reply_markup: {
-        inline_keyboard: [
-          [
-            { text: `Play ${randomGame.name}`, url: randomGame.url }
-          ],
-          [
-            { text: 'Another Random Game', callback_data: 'quick_play' },
-            { text: 'View All Games', callback_data: 'game_list_page_1' }
-          ],
-          [
-            { text: 'Back to Main', callback_data: 'back_to_main' }
-          ]
-        ]
-      },
-      parse_mode: 'Markdown'
-    };
-    
-    try {
-      await ctx.editMessageText(quickPlayMessage, quickPlayKeyboard);
-    } catch (editError) {
-      await ctx.reply(quickPlayMessage, quickPlayKeyboard);
-    }
-    
-  } catch (error) {
-    console.error('❌ Error in handleQuickPlay:', error.message);
-    
-    const errorMessage = '❌ Error loading quick play. Please try again later.';
-    const errorKeyboard = {
-      reply_markup: {
-        inline_keyboard: [
-          [{ text: 'Back to Main', callback_data: 'back_to_main' }]
-        ]
-      }
-    };
-    
-    try {
-      await ctx.editMessageText(errorMessage, errorKeyboard);
-    } catch (editError) {
-      await ctx.reply(errorMessage, errorKeyboard);
-    }
-  }
-}
-
 async function handleGameDetail(ctx, gameId) {
   try {
     console.log(`🔄 Fetching game details for ID: ${gameId}`);
@@ -320,8 +219,6 @@ async function handleGameDetail(ctx, gameId) {
 }
 
 module.exports = {
-  handleGameMenu,
   handleGameList,
-  handleQuickPlay,
   handleGameDetail
 };
