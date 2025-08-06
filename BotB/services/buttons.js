@@ -19,11 +19,11 @@ module.exports = {
   // Navigation keyboard
   navigationKeyboard: () => Markup.inlineKeyboard([
     [
-      Markup.button.callback('⬅️ Previous', 'nav_previous'),
-      Markup.button.callback('➡️ Next', 'nav_next')
+      Markup.button.callback('Previous', 'nav_previous'),
+      Markup.button.callback('Next', 'nav_next')
     ],
     [
-      Markup.button.callback('🏠 Back to Main', 'back_to_main')
+      Markup.button.callback('Back to Main', 'back_to_main')
     ]
   ]).reply_markup
 }; 
