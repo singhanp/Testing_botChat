@@ -24,7 +24,7 @@ class Register {
       startTime: Date.now()
     });
     
-    await ctx.reply('Please submit your Agent ID and Email Address');
+    await ctx.reply('Please submit your Agent ID and Email Address \n\nExample:\nBACC112\nagent112@example.com');
   }
 
   /**
