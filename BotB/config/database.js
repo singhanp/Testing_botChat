@@ -1,28 +1,26 @@
 const mongoose = require('mongoose');
 
 const connectDB = async () => {
+  const baseURI = process.env.MONGODB_URI;
+  const dbName = process.env.TELEBOT;
+
+  if (!baseURI || !dbName) {
+    throw new Error('Missing MONGODB_URI or TELEBOT in .env');
+  }
+
+  const fullURI = `${baseURI}${dbName}?authSource=admin`; // Add authSource if needed for cloud DBs
+
   try {
-    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/telegram-bot';
-    
-    await mongoose.connect(mongoURI, {
+    await mongoose.connect(fullURI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    
-    console.log('✅ MongoDB connected successfully');
-  } catch (error) {
-    console.error('❌ MongoDB connection error:', error.message);
+
+    console.log(`✅ Connected to MongoDB database: ${dbName}`);
+  } catch (err) {
+    console.error('❌ MongoDB connection error:', err.message);
     process.exit(1);
   }
 };
 
-const disconnectDB = async () => {
-  try {
-    await mongoose.disconnect();
-    console.log('✅ MongoDB disconnected successfully');
-  } catch (error) {
-    console.error('❌ MongoDB disconnection error:', error.message);
-  }
-};
-
-module.exports = { connectDB, disconnectDB }; 
+module.exports = { connectDB };

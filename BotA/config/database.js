@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   const baseURI = process.env.MONGODB_URI;
-  const dbName = process.env.MONGODB_MEMBER;
+  const dbName = process.env.TELEBOT;
 
   if (!baseURI || !dbName) {
-    throw new Error('Missing MONGODB_URI or MONGODB_MEMBER in .env');
+    throw new Error('Missing MONGODB_URI or TELEBOT in .env');
   }
 
   const fullURI = `${baseURI}${dbName}?authSource=admin`; // Add authSource if needed for cloud DBs

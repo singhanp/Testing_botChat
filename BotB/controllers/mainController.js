@@ -3,19 +3,34 @@ const buttons = require('../services/buttons');
 const home = require('./home');
 const game = require('./game');
 const login = require('./login');
+const directAccessService = require('../services/directAccessService');
+const userTrackingService = require('../services/userTrackingService');
 
-module.exports = (bot, scheduler, botB = null) => {
+module.exports = (bot, scheduler, dynamicBotManager = null) => {
   // Store user data temporarily (if needed)
   const userData = {};
 
   // Start command with role-based welcome
   bot.start(async (ctx) => {
     const userId = ctx.from.id;
+    const botUsername = ctx.botInfo?.username || 'unknown_bot';
+    const startPayload = ctx.message?.text?.split(' ')[1];
+    
+    // Track start command interaction
+    userTrackingService.logStartInteraction(userId, botUsername, startPayload, ctx);
+    
+    // Check for direct access first
+    if (dynamicBotManager) {
+      const handled = await directAccessService.handleStartWithDirectAccess(ctx, dynamicBotManager);
+      if (handled) {
+        return; // Direct access was handled
+      }
+    }
+    
     const userRole = await getUserRole(userId);
     const userInfo = await getUserInfo(userId);
     
     // Check if user came from Bot A login
-    const startPayload = ctx.message?.text?.split(' ')[1];
     const isFromLogin = startPayload === 'from_login';
     
     let welcomeMessage = '';
@@ -52,13 +67,20 @@ module.exports = (bot, scheduler, botB = null) => {
 
   // Handle users who haven't started the bot yet (when they send any message)
   bot.on('message', async (ctx) => {
+    const userId = ctx.from.id;
+    const botUsername = ctx.botInfo?.username || 'unknown_bot';
+    
+    // Track text message interaction
+    if (ctx.message.text && !ctx.message.text.startsWith('/')) {
+      userTrackingService.logTextInteraction(userId, botUsername, ctx.message.text, ctx);
+    }
+    
     // Skip if it's a command (handled by other handlers)
     if (ctx.message.text && ctx.message.text.startsWith('/')) {
       return;
     }
     
     // Check if this is the first message from this user
-    const userId = ctx.from.id;
     const userRole = await getUserRole(userId);
     
     // If user has a role but this might be their first interaction
@@ -118,8 +140,12 @@ module.exports = (bot, scheduler, botB = null) => {
   // Role-based commands
   bot.command('myrole', async (ctx) => {
     const userId = ctx.from.id;
+    const botUsername = ctx.botInfo?.username || 'unknown_bot';
     const userRole = await getUserRole(userId);
     const userInfo = await getUserInfo(userId);
+    
+    // Track command interaction
+    userTrackingService.logCommandInteraction(userId, botUsername, 'myrole', ctx);
     
     let roleMessage = `🎭 Your Role: ${userRole.toUpperCase()}\n\n`;
     
@@ -146,7 +172,11 @@ module.exports = (bot, scheduler, botB = null) => {
   // Super Admin commands
   bot.command('systemstats', async (ctx) => {
     const userId = ctx.from.id;
+    const botUsername = ctx.botInfo?.username || 'unknown_bot';
     const userRole = await getUserRole(userId);
+    
+    // Track command interaction
+    userTrackingService.logCommandInteraction(userId, botUsername, 'systemstats', ctx);
     
     if (userRole !== 'super_admin') {
       await ctx.reply('❌ This command is only available for Super Administrators.');
@@ -170,7 +200,11 @@ module.exports = (bot, scheduler, botB = null) => {
   // Agent commands
   bot.command('agentstats', async (ctx) => {
     const userId = ctx.from.id;
+    const botUsername = ctx.botInfo?.username || 'unknown_bot';
     const userRole = await getUserRole(userId);
+    
+    // Track command interaction
+    userTrackingService.logCommandInteraction(userId, botUsername, 'agentstats', ctx);
     
     if (userRole !== 'agent') {
       await ctx.reply('❌ This command is only available for Agents.');
@@ -193,7 +227,11 @@ module.exports = (bot, scheduler, botB = null) => {
   // Member commands
   bot.command('mystats', async (ctx) => {
     const userId = ctx.from.id;
+    const botUsername = ctx.botInfo?.username || 'unknown_bot';
     const userRole = await getUserRole(userId);
+    
+    // Track command interaction
+    userTrackingService.logCommandInteraction(userId, botUsername, 'mystats', ctx);
     
     if (userRole !== 'member') {
       await ctx.reply('❌ This command is only available for Members.');
@@ -318,11 +356,48 @@ module.exports = (bot, scheduler, botB = null) => {
     await ctx.reply('🧪 Test good morning messages sent to all subscribed users!');
   });
 
+  // User tracking statistics command (Super Admin only)
+  bot.command('trackingstats', async (ctx) => {
+    const userId = ctx.from.id;
+    const botUsername = ctx.botInfo?.username || 'unknown_bot';
+    const userRole = await getUserRole(userId);
+    
+    // Track command interaction
+    userTrackingService.logCommandInteraction(userId, botUsername, 'trackingstats', ctx);
+    
+    if (userRole !== 'super_admin') {
+      await ctx.reply('❌ This command is only available for Super Administrators.');
+      return;
+    }
+    
+    const stats = userTrackingService.getInteractionStats();
+    const currentBot = userTrackingService.getUserCurrentBot(userId);
+    
+    let statsMessage = `📊 User Tracking Statistics\n\n`;
+    statsMessage += `📈 Total Interactions: ${stats.totalInteractions}\n`;
+    statsMessage += `👥 Unique Users: ${stats.uniqueUsers}\n`;
+    statsMessage += `🤖 Current Bot: @${botUsername}\n`;
+    statsMessage += `👤 Your Current Bot: ${currentBot ? `@${currentBot}` : 'None'}\n\n`;
+    
+    if (Object.keys(stats.botInteractions).length > 0) {
+      statsMessage += `🤖 Bot Interactions:\n`;
+      for (const [botUsername, count] of Object.entries(stats.botInteractions)) {
+        statsMessage += `   @${botUsername}: ${count} interactions\n`;
+      }
+    }
+    
+    await ctx.reply(statsMessage);
+  });
+
   // Callback query handler for inline buttons with role-based actions
   bot.on('callback_query', async (ctx) => {
     const action = ctx.callbackQuery.data;
     const userId = ctx.from.id;
+    const botUsername = ctx.botInfo?.username || 'unknown_bot';
     const userRole = await getUserRole(userId);
+    
+    // Track callback interaction
+    userTrackingService.logCallbackInteraction(userId, botUsername, action, ctx);
     
     switch (action) {
       case 'login':

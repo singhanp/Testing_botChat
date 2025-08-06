@@ -1,16 +1,44 @@
 require('dotenv').config();
-const { Telegraf } = require('telegraf');
-const botB = new Telegraf(process.env.BOT_B_TOKEN);
+const { connectDB } = require('./config/database');
+const dynamicBotManager = require('./services/dynamicBotManager');
+const WebhookService = require('./services/webhookService');
 
-const SchedulerService = require('./services/scheduler');
-const mainController = require('./controllers/mainController');
+async function startBotB() {
+  try {
+    // Connect to database
+    await connectDB();
+    console.log('✅ Database connected successfully');
 
-const schedulerB = new SchedulerService(botB);
-mainController(botB, schedulerB);
+    // Initialize webhook service
+    const webhookService = new WebhookService();
+    webhookService.start();
 
-botB.launch().then(() => {
-  console.log('🤖 BotB (Main Features) started!');
-});
+    // Initialize all dynamic bots from database
+    await dynamicBotManager.initializeBots();
 
-process.once('SIGINT', () => botB.stop('SIGINT'));
-process.once('SIGTERM', () => botB.stop('SIGTERM'));
+    console.log('🤖 BotB (Dynamic Multi-Bot System) started successfully!');
+    console.log('📊 Active bots:', dynamicBotManager.getActiveBots());
+
+    // Graceful shutdown handling
+    process.once('SIGINT', async () => {
+      console.log('🛑 Shutting down BotB...');
+      await dynamicBotManager.shutdownAllBots();
+      webhookService.stop();
+      process.exit(0);
+    });
+
+    process.once('SIGTERM', async () => {
+      console.log('🛑 Shutting down BotB...');
+      await dynamicBotManager.shutdownAllBots();
+      webhookService.stop();
+      process.exit(0);
+    });
+
+  } catch (error) {
+    console.error('❌ Error starting BotB:', error);
+    process.exit(1);
+  }
+}
+
+// Start the application
+startBotB();

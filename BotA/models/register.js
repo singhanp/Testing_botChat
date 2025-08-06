@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const botService = require('../services/botService');
 const tokenValidator = require('../services/tokenValidator');
+const webhookNotifier = require('../services/webhookNotifier');
 
 class Register {
   constructor() {
@@ -198,8 +199,12 @@ class Register {
         // Clear registration session
         this.registrationSessions.delete(ctx.from.id);
         
-        // Create success message
-        const successMessage = `Registration Successful!\n\nBot Username: @${validationResult.botInfo.username}\nBot ID: ${validationResult.botInfo.id}\nRegistered: ${new Date().toLocaleString()}\n\nYour bot is now registered and ready to use!\n\nYou can proceed to your business now.\nYou may ask your member add @${validationResult.botInfo.username}`;
+        // Notify BotB about the new bot registration
+        await webhookNotifier.notifyBotRegistration(savedBot);
+        
+        // Create success message with direct access link
+        const directAccessLink = `https://t.me/${validationResult.botInfo.username}?start=direct_access`;
+        const successMessage = `Registration Successful!\n\nBot Username: @${validationResult.botInfo.username}\nBot ID: ${validationResult.botInfo.id}\nRegistered: ${new Date().toLocaleString()}\n\nYour bot is now registered and ready to use!\n\n🔗 Direct Access Link:\n${directAccessLink}\n\nYou can proceed to your business now.\nYou may ask your member add @${validationResult.botInfo.username}`;
         
         await ctx.reply(successMessage);
         
