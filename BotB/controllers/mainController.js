@@ -49,16 +49,9 @@ module.exports = (bot, scheduler, dynamicBotManager = null) => {
       const result = authenticationService.verifyOTP(userId, input);
       
       if (result.success) {
-        const actionType = session.authType === 'register' ? 'Registration' : 'Login';
-        const successMessage = `${actionType} Successful!\n\nWelcome ${ctx.from.first_name}! Your ${session.contactType} has been verified.\n\nYou can now access all bot features.`;
-        
-        await ctx.reply(successMessage, { 
-          reply_markup: {
-            inline_keyboard: [
-              [{ text: 'Continue to Main Menu', callback_data: 'auth_complete' }]
-            ]
-          }
-        });
+        // Go directly to welcome message instead of showing intermediate success message
+        const home = require('./home');
+        await home.handleHome(ctx);
       } else {
         let errorMessage = `Verification Failed\n\n`;
         
@@ -99,8 +92,8 @@ module.exports = (bot, scheduler, dynamicBotManager = null) => {
         break;
         
       case 'auth_complete':
-        const welcomeMessage = `Welcome ${ctx.from.first_name}!\n\nPlease select an action from the options below.`;
-        await ctx.editMessageText(welcomeMessage, { reply_markup: buttons.welcomeKeyboard() });
+        const home = require('./home');
+        await home.handleHome(ctx);
         break;
         
       case 'restart_auth':
