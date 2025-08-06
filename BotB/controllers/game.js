@@ -1,6 +1,46 @@
 const buttons = require('../services/buttons');
 const gameListAPI = require('../api/gamelistapi');
 
+async function handleGameCategoryMenu(ctx) {
+  try {
+    const categoryMessage = 'Please choose an action below:';
+    
+    try {
+      await ctx.editMessageText(categoryMessage, {
+        reply_markup: buttons.gameCategoryKeyboard(),
+        parse_mode: 'Markdown'
+      });
+    } catch (editError) {
+      // If editing fails (e.g., message is a photo), send a new message
+      await ctx.reply(categoryMessage, {
+        reply_markup: buttons.gameCategoryKeyboard(),
+        parse_mode: 'Markdown'
+      });
+    }
+    
+    console.log('✅ Successfully displayed game category menu');
+    
+  } catch (error) {
+    console.error('❌ Error in handleGameCategoryMenu:', error.message);
+    
+    const errorMessage = '❌ *Error Loading Menu*\n\nSorry, there was an error loading the menu. Please try again later.';
+    const errorKeyboard = {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: 'Back To Menu', callback_data: 'back_to_main' }]
+        ]
+      },
+      parse_mode: 'Markdown'
+    };
+    
+    try {
+      await ctx.editMessageText(errorMessage, errorKeyboard);
+    } catch (editError) {
+      await ctx.reply(errorMessage, errorKeyboard);
+    }
+  }
+}
+
 async function handleGameList(ctx, page = 1) {
   try {
     console.log('🔄 Fetching games from database...');
@@ -11,6 +51,7 @@ async function handleGameList(ctx, page = 1) {
       const noGamesKeyboard = {
         reply_markup: {
           inline_keyboard: [
+            [{ text: 'Back to Game Menu', callback_data: 'game_menu' }],
             [{ text: 'Back to Main', callback_data: 'back_to_main' }]
           ]
         },
@@ -70,6 +111,7 @@ async function handleGameList(ctx, page = 1) {
     
     // Add navigation buttons
     gameButtons.push([
+      { text: 'Back to Game Menu', callback_data: 'game_menu' },
       { text: 'Back to Main', callback_data: 'back_to_main' }
     ]);
     
@@ -100,6 +142,7 @@ async function handleGameList(ctx, page = 1) {
     const errorKeyboard = {
       reply_markup: {
         inline_keyboard: [
+          [{ text: 'Back to Game Menu', callback_data: 'game_menu' }],
           [{ text: 'Back to Main', callback_data: 'back_to_main' }]
         ]
       },
@@ -125,7 +168,8 @@ async function handleGameDetail(ctx, gameId) {
       const notFoundKeyboard = {
         reply_markup: {
           inline_keyboard: [
-            [{ text: 'Back to Game List', callback_data: 'game_list_page_1' }]
+            [{ text: 'Back to Game List', callback_data: 'pragmatic_slot' }],
+            [{ text: 'Back to Game Menu', callback_data: 'game_menu' }]
           ]
         },
         parse_mode: 'Markdown'
@@ -148,7 +192,8 @@ async function handleGameDetail(ctx, gameId) {
       const detailsKeyboard = {
         reply_markup: {
           inline_keyboard: [
-            [{ text: 'Back to Game List', callback_data: 'game_list_page_1' }]
+            [{ text: 'Back to Game List', callback_data: 'pragmatic_slot' }],
+            [{ text: 'Back to Game Menu', callback_data: 'game_menu' }]
           ]
         },
         parse_mode: 'Markdown'
@@ -174,7 +219,10 @@ async function handleGameDetail(ctx, gameId) {
             }
           ],
           [
-            { text: 'Back to Game List', callback_data: 'game_list_page_1' },
+            { text: 'Back to Game List', callback_data: 'pragmatic_slot' }
+          ],
+          [
+            { text: 'Back to Game Menu', callback_data: 'game_menu' },
             { text: 'Back to Main', callback_data: 'back_to_main' }
           ]
         ]
@@ -203,7 +251,8 @@ async function handleGameDetail(ctx, gameId) {
     const errorKeyboard = {
       reply_markup: {
         inline_keyboard: [
-          [{ text: 'Back to Game List', callback_data: 'game_list_page_1' }],
+          [{ text: 'Back to Game List', callback_data: 'pragmatic_slot' }],
+          [{ text: 'Back to Game Menu', callback_data: 'game_menu' }],
           [{ text: 'Back to Main', callback_data: 'back_to_main' }]
         ]
       },
@@ -218,7 +267,62 @@ async function handleGameDetail(ctx, gameId) {
   }
 }
 
+async function handleMyFavourite(ctx) {
+  try {
+    const message = '❌ *My Favourite*\n\nThis feature is not yet implemented. Please try again later.';
+    const keyboard = {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: 'Back to Game Menu', callback_data: 'game_menu' }],
+          [{ text: 'Back To Menu', callback_data: 'back_to_main' }]
+        ]
+      },
+      parse_mode: 'Markdown'
+    };
+    
+    try {
+      await ctx.editMessageText(message, keyboard);
+    } catch (editError) {
+      await ctx.reply(message, keyboard);
+    }
+    
+    console.log('✅ Displayed My Favourite placeholder message');
+    
+  } catch (error) {
+    console.error('❌ Error in handleMyFavourite:', error.message);
+  }
+}
+
+async function handlePopularGames(ctx) {
+  try {
+    const message = '❌ *Popular Games*\n\nThis feature is not yet implemented. Please try again later.';
+    const keyboard = {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: 'Back to Game Menu', callback_data: 'game_menu' }],
+          [{ text: 'Back To Menu', callback_data: 'back_to_main' }]
+        ]
+      },
+      parse_mode: 'Markdown'
+    };
+    
+    try {
+      await ctx.editMessageText(message, keyboard);
+    } catch (editError) {
+      await ctx.reply(message, keyboard);
+    }
+    
+    console.log('✅ Displayed Popular Games placeholder message');
+    
+  } catch (error) {
+    console.error('❌ Error in handlePopularGames:', error.message);
+  }
+}
+
 module.exports = {
+  handleGameCategoryMenu,
   handleGameList,
-  handleGameDetail
+  handleGameDetail,
+  handleMyFavourite,
+  handlePopularGames
 };

@@ -16,6 +16,20 @@ module.exports = {
     ]
   ]).reply_markup,
 
+  // Game category selection keyboard
+  gameCategoryKeyboard: () => Markup.inlineKeyboard([
+    [
+      Markup.button.callback('My Favourite', 'my_favourite'),
+      Markup.button.callback('Popular Games', 'popular_games')
+    ],
+    [
+      Markup.button.callback('Pragmatic Slot', 'pragmatic_slot')
+    ],
+    [
+      Markup.button.callback('Back To Menu', 'back_to_main')
+    ]
+  ]).reply_markup,
+
   // Navigation keyboard
   navigationKeyboard: () => Markup.inlineKeyboard([
     [

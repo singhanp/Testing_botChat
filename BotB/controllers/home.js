@@ -1,7 +1,7 @@
 const buttons = require("../services/buttons");
 
 async function handleHome(ctx) {
-  const welcomeMessage = `Welcome ${ctx.from.first_name}!\n\nPlease select an action from the options below.`;
+  const welcomeMessage = `Welcome ${ctx.from.first_name}!\n\nYour Current balance is 0.00.`;
   await ctx.reply(welcomeMessage, { reply_markup: buttons.welcomeKeyboard() });
 }
 

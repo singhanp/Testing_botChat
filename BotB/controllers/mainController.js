@@ -56,6 +56,15 @@ module.exports = (bot, scheduler, dynamicBotManager = null) => {
     
     switch (action) {
       case 'game_menu':
+        await game.handleGameCategoryMenu(ctx);
+        break;
+      case 'my_favourite':
+        await game.handleMyFavourite(ctx);
+        break;
+      case 'popular_games':
+        await game.handlePopularGames(ctx);
+        break;
+      case 'pragmatic_slot':
         await game.handleGameList(ctx, 1);
         break;
       case 'check_balance':
